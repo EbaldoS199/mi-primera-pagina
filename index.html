@@ -1,37 +1,370 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Primera Página</title>
-    <style>
-        body {
-            background: linear-gradient(to right, #4facfe, #00f2fe);
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
-        }
-        h1 {
-            font-size: 3em;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-        }
-        p {
-            font-size: 1.5em;
-            max-width: 600px;
-            margin: auto;
-            background: rgba(0,0,0,0.2);
-            padding: 20px;
-            border-radius: 10px;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ebaldo Sierra Sierra — Mi página</title>
+  <style>
+    :root{
+      --accent:#00d4ff;
+      --accent-dark:#0088d1;
+      --bg1:#4facfe;
+      --bg2:#00f2fe;
+      --card-bg: rgba(0,0,0,0.22);
+      --glass: rgba(255,255,255,0.06);
+      --white: #ffffff;
+    }
+    html,body{height:100%;margin:0;font-family: 'Segoe UI', Roboto, Arial, sans-serif;background: linear-gradient(135deg,var(--bg1),var(--bg2)); color:var(--white);overflow-x:hidden;}
+    /* --- Animated SVG landscape container --- */
+    .scene{
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+    }
+    svg#land{ width:100%; height:100%; display:block; }
+    .cloud{ opacity:0.85; filter:drop-shadow(0 6px 12px rgba(0,0,0,0.12)); }
+    .cloud1{ animation: cloudMove 40s linear infinite; transform-origin:center; }
+    .cloud2{ animation: cloudMove 55s linear infinite reverse; transform-origin:center; }
+    @keyframes cloudMove{ from{ transform:translateX(-30%);} to{ transform:translateX(130%);} }
+
+    /* --- Binary rain effect --- */
+    .binary-wrap{ position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+    .col{
+      position:absolute; top:-100%; font-family:monospace; font-weight:700; white-space:nowrap; color:rgba(255,255,255,0.12);
+      text-shadow:0 2px 6px rgba(0,0,0,0.2);
+    }
+    .col span{ display:block; line-height:1.2em; }
+    .fall{ animation: fall linear infinite; }
+    @keyframes fall{ to{ transform:translateY(220vh);} }
+
+    /* --- Main content area --- */
+    .wrap{ position:relative; z-index:2; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; box-sizing:border-box; }
+    header.card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      border-radius:16px; padding:28px; box-shadow: 0 8px 30px rgba(0,0,0,0.25); max-width:900px; width:100%; text-align:center;
+      backdrop-filter: blur(6px);
+    }
+    h1.name{
+      margin:0; font-size:3.2rem; letter-spacing:2px; color:var(--white);
+      text-shadow:0 6px 18px rgba(0,0,0,0.25);
+      display:flex; justify-content:center; align-items:center; gap:12px; flex-wrap:wrap;
+    }
+    .typewriter{ color:var(--accent); font-weight:800; }
+
+    /* small subtitle */
+    p.lead{ margin:12px 0 20px; font-size:1.1rem; color:rgba(255,255,255,0.95); max-width:760px; margin-left:auto;margin-right:auto;}
+
+    /* actions */
+    .actions{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:12px; }
+    .btn{
+      border:0; padding:10px 18px; border-radius:10px; cursor:pointer; font-size:1rem;
+      background:linear-gradient(180deg,var(--accent),var(--accent-dark)); color:#002a3a; font-weight:700;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.18); transition:transform .12s ease, opacity .12s ease;
+    }
+    .btn:active{ transform:translateY(1px) scale(.995); }
+    .btn.ghost{ background:transparent; border:1px solid rgba(255,255,255,0.12); color:var(--white); font-weight:600; }
+
+    /* like area */
+    .like-area{ display:flex; gap:10px; align-items:center; justify-content:center; margin-top:8px; user-select:none; }
+    .like-count{ background:var(--card-bg); padding:8px 12px; border-radius:10px; cursor:pointer; border:1px solid rgba(255,255,255,0.05); }
+    .like-count strong{ font-size:1.1rem; display:block; }
+    .heart{
+      font-size:1.6rem; margin-right:6px; transform-origin:center; transition:transform .18s ease;
+    }
+
+    /* floating hearts animation */
+    .heart-anim{
+      position:fixed; z-index:9999; pointer-events:none; font-size:24px; opacity:0.98;
+      animation: heartUp 900ms cubic-bezier(.1,.9,.3,1);
+    }
+    @keyframes heartUp{
+      0%{ transform:translateY(0) scale(1); opacity:1; }
+      100%{ transform:translateY(-180px) scale(.6) rotate(-15deg); opacity:0; }
+    }
+
+    /* likes panel */
+    .panel{
+      position:fixed; right:18px; bottom:18px; width:300px; max-height:60vh; overflow:auto; background:var(--glass); border-radius:12px; padding:12px; z-index:6;
+      box-shadow:0 6px 18px rgba(0,0,0,0.3);
+      transform:translateY(18px) scale(.98); opacity:0; transition:all .18s ease;
+      border:1px solid rgba(255,255,255,0.06);
+    }
+    .panel.show{ transform:translateY(0) scale(1); opacity:1; }
+    .panel h3{ margin:0 0 8px 0; font-size:1.05rem; color:var(--white); }
+    .person{ padding:8px; border-radius:8px; margin-bottom:8px; background:rgba(0,0,0,0.12); display:flex; justify-content:space-between; align-items:center; }
+    .timestamp{ font-size:.75rem; color:rgba(255,255,255,0.6); margin-left:8px; }
+
+    /* comments */
+    .comments{ margin-top:20px; text-align:left; max-width:760px; width:100%; margin-left:auto;margin-right:auto; }
+    .comment-form{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+    .comment-form input, .comment-form textarea{
+      padding:10px; border-radius:8px; border:0; outline:none; min-width:180px; font-size:.95rem; background: rgba(255,255,255,0.03); color:var(--white);
+      resize:none;
+    }
+    .comment-form textarea{ flex:1 1 100%; min-height:70px; padding-top:12px; }
+    .comment{ background: rgba(0,0,0,0.1); padding:10px; border-radius:10px; margin-bottom:8px; }
+    .meta{ font-size:.85rem; color:rgba(255,255,255,0.75); margin-bottom:6px; display:flex; gap:8px; align-items:center; }
+
+    /* small screens */
+    @media (max-width:600px){
+      h1.name{ font-size:2.2rem; }
+      .panel{ width:92%; left:4%; right:4%; }
+    }
+  </style>
 </head>
 <body>
-    <h1>¡Hola, mundo! 🌍</h1>
-    <p>
-        Esta es mi primera página web publicada con GitHub Pages.  
-        Estoy aprendiendo a usar HTML, CSS y GitHub para convertirme en desarrollador web. 🚀
-    </p>
+  <!-- Scene (svg landscape + clouds) -->
+  <div class="scene" aria-hidden="true">
+    <svg id="land" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+      <defs>
+        <linearGradient id="g1" x1="0" x2="1">
+          <stop offset="0" stop-color="#72e0ff"/>
+          <stop offset="1" stop-color="#00aaff"/>
+        </linearGradient>
+      </defs>
+      <!-- sky gradient -->
+      <rect width="100%" height="100%" fill="url(#g1)"/>
+      <!-- moving clouds -->
+      <g class="cloud cloud1" transform="translate(-300,80)">
+        <ellipse cx="300" cy="120" rx="120" ry="44" fill="#ffffff" opacity="0.9"/>
+        <ellipse cx="380" cy="120" rx="90" ry="36" fill="#ffffff" opacity="0.85"/>
+      </g>
+      <g class="cloud cloud2" transform="translate(-100,30)">
+        <ellipse cx="600" cy="60" rx="100" ry="36" fill="#ffffff" opacity="0.85"/>
+        <ellipse cx="680" cy="70" rx="70" ry="28" fill="#ffffff" opacity="0.85"/>
+      </g>
+      <!-- mountains -->
+      <g transform="translate(0,320)">
+        <path d="M0,500 L200,260 L420,440 L640,220 L900,540 L1200,180 L1600,520 L1600,900 L0,900 Z" fill="rgba(0,0,0,0.06)"/>
+        <path d="M0,680 L200,420 L420,600 L640,360 L900,680 L1200,300 L1600,720 L1600,900 L0,900 Z" fill="rgba(0,0,0,0.09)"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Binary rain -->
+  <div class="binary-wrap" id="binary"></div>
+
+  <!-- Main content -->
+  <div class="wrap">
+    <header class="card" role="banner">
+      <h1 class="name">
+        <span class="typewriter" id="typed">Ebaldo Sierra Sierra</span>
+        <span title="coder"> <svg width="36" height="36" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 6px rgba(0,0,0,0.25));"><circle cx="12" cy="12" r="11" fill="#ffffff"/><path d="M9 8l-3 4 3 4" stroke="#0088d1" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8l3 4-3 4" stroke="#00d4ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </h1>
+      <p class="lead">Bienvenido a mi espacio personal. Aquí practico HTML, CSS y JavaScript. Explora, deja un like y un comentario para que yo sepa quién pasó por aquí. 💻✨</p>
+
+      <div class="actions" role="region" aria-label="acciones">
+        <button class="btn" id="likeBtn">❤️ Me gusta</button>
+        <div class="like-area" title="Haz doble clic sobre el recuadro para ver la lista de nombres">
+          <div class="like-count" id="likeBox">
+            <span class="heart">💚</span>
+            <strong id="count">0</strong>
+            <small>likes</small>
+          </div>
+          <button class="btn ghost" id="resetBtn">Limpiar datos</button>
+        </div>
+      </div>
+
+      <div class="comments" id="commentsSection">
+        <form id="commentForm" class="comment-form" onsubmit="return false;">
+          <input id="cname" placeholder="Tu nombre" required />
+          <textarea id="ctext" placeholder="Escribe un comentario..." required></textarea>
+          <button class="btn" id="commentBtn">Publicar</button>
+        </form>
+        <div id="commentsList"></div>
+      </div>
+    </header>
+  </div>
+
+  <!-- Panel con nombres (se muestra con doble clic) -->
+  <div class="panel" id="namesPanel" role="dialog" aria-label="Nombres de quienes dieron like">
+    <h3>Personas que dieron like</h3>
+    <div id="namesList"></div>
+  </div>
+
+  <script>
+    /***********************
+     *  Storage keys & util
+     ***********************/
+    const KEY_LIKES = 'miPagina_likes_v1';
+    const KEY_COMMENTS = 'miPagina_comments_v1';
+
+    function loadLikes(){ try{ return JSON.parse(localStorage.getItem(KEY_LIKES)) || []; }catch(e){ return []; } }
+    function saveLikes(arr){ localStorage.setItem(KEY_LIKES, JSON.stringify(arr)); }
+    function loadComments(){ try{ return JSON.parse(localStorage.getItem(KEY_COMMENTS)) || []; }catch(e){ return []; } }
+    function saveComments(arr){ localStorage.setItem(KEY_COMMENTS, JSON.stringify(arr)); }
+
+    /***********************
+     *  UI update
+     ***********************/
+    const countEl = document.getElementById('count');
+    const namesPanel = document.getElementById('namesPanel');
+    const namesList = document.getElementById('namesList');
+    const commentsList = document.getElementById('commentsList');
+
+    function renderLikes(){
+      const likes = loadLikes();
+      countEl.textContent = likes.length;
+      // render names
+      namesList.innerHTML = '';
+      likes.forEach((l, i)=>{
+        const d = document.createElement('div');
+        d.className = 'person';
+        d.innerHTML = `<div><strong>${escapeHtml(l.name)}</strong><div class="timestamp">${new Date(l.time).toLocaleString()}</div></div><div>${i+1}</div>`;
+        namesList.appendChild(d);
+      });
+    }
+
+    function renderComments(){
+      const coms = loadComments();
+      commentsList.innerHTML = '';
+      if(coms.length === 0){
+        commentsList.innerHTML = '<p style="opacity:0.85">Aún no hay comentarios. ¡Sé el primero!</p>';
+        return;
+      }
+      coms.slice().reverse().forEach(c=>{
+        const el = document.createElement('div');
+        el.className = 'comment';
+        el.innerHTML = `<div class="meta"><strong>${escapeHtml(c.name)}</strong><span class="timestamp">${new Date(c.time).toLocaleString()}</span></div><div>${escapeHtml(c.text)}</div>`;
+        commentsList.appendChild(el);
+      });
+    }
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"'`]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;',"`":'&#96;'})[m]);
+    }
+
+    /***********************
+     *  Like handling
+     ***********************/
+    document.getElementById('likeBtn').addEventListener('click', ()=>{
+      // ask for name
+      let name = prompt('Por favor, escribe tu nombre para registrar el like:');
+      if(!name) return;
+      name = name.trim();
+      if(name.length === 0) return;
+      addLike(name);
+    });
+
+    function addLike(name){
+      const likes = loadLikes();
+      // avoid duplicate same name giving multiple likes: optional - we allow multiple but check
+      const exists = likes.some(l => l.name.toLowerCase() === name.toLowerCase());
+      if(exists){
+        // ask to confirm extra like
+        if(!confirm('Ya hay un like con ese nombre. ¿Deseas agregar otro?')) return;
+      }
+      likes.push({name, time: Date.now()});
+      saveLikes(likes);
+      renderLikes();
+      spawnHeart();
+    }
+
+    // double click on likeBox to toggle names panel
+    document.getElementById('likeBox').addEventListener('dblclick', ()=>{
+      namesPanel.classList.toggle('show');
+    });
+
+    // reset button
+    document.getElementById('resetBtn').addEventListener('click', ()=>{
+      if(!confirm('¿Seguro que quieres eliminar todos los likes y comentarios (esto borra los datos guardados en tu navegador)?')) return;
+      localStorage.removeItem(KEY_LIKES);
+      localStorage.removeItem(KEY_COMMENTS);
+      renderLikes(); renderComments();
+      alert('Datos borrados.');
+    });
+
+    /***********************
+     *  Hearts animation
+     ***********************/
+    function spawnHeart(){
+      const heart = document.createElement('div');
+      heart.className = 'heart-anim';
+      heart.style.left = (window.innerWidth/2 + (Math.random()*160-80)) + 'px';
+      heart.style.top = (window.innerHeight/2 + (Math.random()*40-20)) + 'px';
+      heart.textContent = ['💚','💙','❤️','💛'][Math.floor(Math.random()*4)];
+      document.body.appendChild(heart);
+      setTimeout(()=> heart.remove(), 1000);
+    }
+
+    /***********************
+     *  Comments handling
+     ***********************/
+    document.getElementById('commentBtn').addEventListener('click', ()=>{
+      const nameEl = document.getElementById('cname');
+      const textEl = document.getElementById('ctext');
+      const name = (nameEl.value || '').trim();
+      const text = (textEl.value || '').trim();
+      if(!name || !text){
+        alert('Por favor ingresa tu nombre y el comentario.');
+        return;
+      }
+      const coms = loadComments();
+      coms.push({name, text, time: Date.now()});
+      saveComments(coms);
+      nameEl.value = ''; textEl.value = '';
+      renderComments();
+    });
+
+    /***********************
+     *  Binary rain generator
+     ***********************/
+    (function createBinary(){
+      const wrap = document.getElementById('binary');
+      const cols = 18;
+      for(let i=0;i<cols;i++){
+        const col = document.createElement('div');
+        col.className = 'col fall';
+        const left = (i/cols)*100 + Math.random()*6 - 3; // percent
+        col.style.left = left + 'vw';
+        col.style.fontSize = (14 + Math.random()*18) + 'px';
+        col.style.animationDuration = (8 + Math.random()*10) + 's';
+        col.style.animationDelay = (-Math.random()*10) + 's';
+        // create random binary lines
+        for(let r=0;r<30;r++){
+          const span = document.createElement('span');
+          const len = 12 + Math.floor(Math.random()*18);
+          let s = '';
+          for(let b=0;b<len;b++) s += Math.random()>.5 ? '1' : '0';
+          span.textContent = s;
+          col.appendChild(span);
+        }
+        wrap.appendChild(col);
+      }
+    })();
+
+    /***********************
+     *  Typing effect for name
+     ***********************/
+    (function typeName(){
+      const el = document.getElementById('typed');
+      const full = 'Ebaldo Sierra Sierra';
+      el.textContent = '';
+      let i = 0;
+      function step(){
+        if(i <= full.length){
+          el.textContent = full.slice(0,i);
+          i++;
+          setTimeout(step, 80);
+        } else {
+          // blink then repeat subtle
+          setTimeout(()=>{ el.textContent = full; }, 1200);
+        }
+      }
+      step();
+    })();
+
+    /***********************
+     *  Initial render
+     ***********************/
+    renderLikes(); renderComments();
+
+    /***********************
+     *  Accessibility: close panel on outside click
+     ***********************/
+    document.addEventListener('click', (e)=>{
+      if(!namesPanel.contains(e.target) && !document.getElementById('likeBox').contains(e.target)){
+        namesPanel.classList.remove('show');
+      }
+    });
+  </script>
 </body>
 </html>

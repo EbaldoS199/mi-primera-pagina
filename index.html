@@ -1,64 +1,294 @@
-<!-- Eliminar botón Limpiar datos -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Comunidad con Juego</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f4f4f4;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    header {
+        background: #333;
+        color: #fff;
+        padding: 10px;
+        width: 100%;
+        text-align: center;
+    }
+    header img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        vertical-align: middle;
+        margin-right: 10px;
+    }
+    .container {
+        max-width: 900px;
+        width: 100%;
+        padding: 15px;
+        background: white;
+        margin-top: 15px;
+        border-radius: 10px;
+    }
+    h2 { margin-top: 0; }
+    .avatar-picker {
+        display: grid;
+        grid-template-columns: repeat(5, 60px);
+        gap: 5px;
+    }
+    .avatar-picker div {
+        width: 60px;
+        height: 60px;
+        background-image: url('avatares.png');
+        background-size: cover;
+        cursor: pointer;
+        border: 2px solid transparent;
+    }
+    .avatar-picker div.selected {
+        border-color: blue;
+    }
+    #chat-box {
+        height: 200px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        padding: 5px;
+        background: #fafafa;
+        margin-bottom: 10px;
+    }
+    .mensaje {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+    .mensaje img {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        margin-right: 5px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+    table, th, td {
+        border: 1px solid #aaa;
+        padding: 5px;
+        text-align: center;
+    }
+    canvas {
+        background: lightblue;
+        display: block;
+        margin: 10px auto;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <img src="foto_perfil.jpg" alt="Foto perfil">
+    <span>Bienvenido a la Mini Comunidad</span>
+</header>
+
+<div class="container" id="registro-container">
+    <h2>Registro de Usuario</h2>
+    <input type="text" id="nombre" placeholder="Ingresa tu nombre"><br><br>
+    <p>Selecciona tu avatar:</p>
+    <div class="avatar-picker" id="avatar-picker"></div>
+    <br>
+    <button onclick="registrarUsuario()">Registrarme</button>
+</div>
+
+<div class="container" id="perfil-container" style="display:none;">
+    <h2>Perfil</h2>
+    <img id="perfil-avatar" src="" width="60" height="60" style="border-radius:50%;"> 
+    <span id="perfil-nombre"></span>
+    <button onclick="cerrarSesion()" style="float:right;">Cerrar sesión</button>
+</div>
+
+<div class="container" id="chat-container" style="display:none;">
+    <h2>Mini Chat</h2>
+    <div id="chat-box"></div>
+    <input type="text" id="mensaje" placeholder="Escribe un mensaje">
+    <button onclick="enviarMensaje()">Enviar</button>
+</div>
+
+<div class="container" id="juego-container" style="display:none;">
+    <h2>Mini Juego - Atrapa el cuadrado</h2>
+    <canvas id="juego" width="300" height="300"></canvas>
+    <p>Puntaje: <span id="puntaje">0</span></p>
+    <button onclick="iniciarJuego()">Jugar de nuevo</button>
+    <h3>Tabla de récords</h3>
+    <table id="tabla-records">
+        <thead>
+            <tr><th>Jugador</th><th>Avatar</th><th>Puntaje</th></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
 
 <script>
-  const likesList = document.getElementById('namesList');
-  const likesCount = document.getElementById('count');
-  const commentsList = document.getElementById('commentsList');
-  
-  // Firestore referencias
-  const likesCollection = db.collection('likes');
-  const commentsCollection = db.collection('comments');
+// ==================== VARIABLES GLOBALES ====================
+let usuario = null;
+let avatarSeleccionado = null;
 
-  // Escuchar likes en tiempo real
-  likesCollection.onSnapshot(snapshot => {
-    const likes = [];
-    snapshot.forEach(doc => likes.push(doc.data()));
-    likesCount.textContent = likes.length;
-    likesList.innerHTML = '';
-    likes.forEach((like, i) => {
-      const div = document.createElement('div');
-      div.textContent = `${like.name} (${new Date(like.timestamp.toDate()).toLocaleString()})`;
-      likesList.appendChild(div);
-    });
-  });
-
-  // Agregar like
-  document.getElementById('likeBtn').addEventListener('click', () => {
-    const name = prompt('Escribe tu nombre para dar like:');
-    if(!name) return;
-    likesCollection.add({
-      name,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  });
-
-  // Escuchar comentarios en tiempo real
-  commentsCollection.orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-    commentsList.innerHTML = '';
-    snapshot.forEach(doc => {
-      const c = doc.data();
-      const div = document.createElement('div');
-      div.innerHTML = `<strong>${c.name}</strong>: ${c.text} <small>${new Date(c.timestamp.toDate()).toLocaleString()}</small>`;
-      commentsList.appendChild(div);
-    });
-  });
-
-  // Enviar comentario
-  document.getElementById('commentBtn').addEventListener('click', () => {
-    const nameInput = document.getElementById('cname');
-    const textInput = document.getElementById('ctext');
-    const name = nameInput.value.trim();
-    const text = textInput.value.trim();
-    if(!name || !text){
-      alert('Ingresa nombre y comentario');
-      return;
+// ==================== CARGAR AVATARES ====================
+function cargarAvatares() {
+    const picker = document.getElementById('avatar-picker');
+    for (let i = 0; i < 10; i++) {
+        let div = document.createElement('div');
+        div.style.backgroundPosition = `-${i * 60}px 0`;
+        div.onclick = function() {
+            document.querySelectorAll('.avatar-picker div').forEach(el => el.classList.remove('selected'));
+            div.classList.add('selected');
+            avatarSeleccionado = i;
+        };
+        picker.appendChild(div);
     }
-    commentsCollection.add({
-      name,
-      text,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+}
+cargarAvatares();
+
+// ==================== REGISTRO ====================
+function registrarUsuario() {
+    const nombre = document.getElementById('nombre').value.trim();
+    if (!nombre || avatarSeleccionado === null) {
+        alert("Debes ingresar un nombre y elegir un avatar");
+        return;
+    }
+    usuario = { nombre, avatar: avatarSeleccionado };
+    localStorage.setItem('usuario', JSON.stringify(usuario));
+    mostrarPerfil();
+}
+
+function mostrarPerfil() {
+    document.getElementById('registro-container').style.display = 'none';
+    document.getElementById('perfil-container').style.display = 'block';
+    document.getElementById('chat-container').style.display = 'block';
+    document.getElementById('juego-container').style.display = 'block';
+
+    document.getElementById('perfil-nombre').innerText = usuario.nombre;
+    document.getElementById('perfil-avatar').src = obtenerAvatar(usuario.avatar);
+    cargarRecords();
+}
+
+function cerrarSesion() {
+    localStorage.removeItem('usuario');
+    location.reload();
+}
+
+function obtenerAvatar(index) {
+    // Devuelve una imagen recortada del sprite
+    let canvas = document.createElement('canvas');
+    canvas.width = 60;
+    canvas.height = 60;
+    let ctx = canvas.getContext('2d');
+    let img = new Image();
+    img.src = 'avatares.png';
+    return new Promise(resolve => {
+        img.onload = () => {
+            ctx.drawImage(img, index * 60, 0, 60, 60, 0, 0, 60, 60);
+            resolve(canvas.toDataURL());
+        };
     });
-    nameInput.value = '';
-    textInput.value = '';
-  });
+}
+
+// ==================== CHAT ====================
+let mensajes = JSON.parse(localStorage.getItem('mensajes')) || [];
+
+async function enviarMensaje() {
+    const texto = document.getElementById('mensaje').value.trim();
+    if (!texto) return;
+    const avatarData = await obtenerAvatar(usuario.avatar);
+    mensajes.push({ nombre: usuario.nombre, avatar: avatarData, texto });
+    localStorage.setItem('mensajes', JSON.stringify(mensajes));
+    document.getElementById('mensaje').value = '';
+    mostrarMensajes();
+}
+
+function mostrarMensajes() {
+    const chatBox = document.getElementById('chat-box');
+    chatBox.innerHTML = '';
+    mensajes.forEach(msg => {
+        const div = document.createElement('div');
+        div.classList.add('mensaje');
+        div.innerHTML = `<img src="${msg.avatar}"><strong>${msg.nombre}:</strong> ${msg.texto}`;
+        chatBox.appendChild(div);
+    });
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// ==================== MINI JUEGO ====================
+let puntaje = 0;
+let objetivo = { x: 50, y: 50, size: 30 };
+
+function iniciarJuego() {
+    puntaje = 0;
+    document.getElementById('puntaje').innerText = puntaje;
+    dibujarJuego();
+}
+
+function dibujarJuego() {
+    const canvas = document.getElementById('juego');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle = 'red';
+    ctx.fillRect(objetivo.x, objetivo.y, objetivo.size, objetivo.size);
+}
+
+document.getElementById('juego').addEventListener('click', e => {
+    const rect = e.target.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    if (x >= objetivo.x && x <= objetivo.x + objetivo.size && y >= objetivo.y && y <= objetivo.y + objetivo.size) {
+        puntaje++;
+        document.getElementById('puntaje').innerText = puntaje;
+        objetivo.x = Math.random() * (300 - objetivo.size);
+        objetivo.y = Math.random() * (300 - objetivo.size);
+        dibujarJuego();
+    }
+    if (puntaje >= 5) {
+        guardarRecord();
+    }
+});
+
+// ==================== TABLA DE RÉCORDS ====================
+let records = JSON.parse(localStorage.getItem('records')) || [];
+
+async function guardarRecord() {
+    const avatarData = await obtenerAvatar(usuario.avatar);
+    records.push({ nombre: usuario.nombre, avatar: avatarData, puntaje });
+    records.sort((a,b) => b.puntaje - a.puntaje);
+    localStorage.setItem('records', JSON.stringify(records));
+    cargarRecords();
+}
+
+function cargarRecords() {
+    const tbody = document.querySelector('#tabla-records tbody');
+    tbody.innerHTML = '';
+    records.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${r.nombre}</td><td><img src="${r.avatar}" width="30" height="30"></td><td>${r.puntaje}</td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+// ==================== AUTO LOGIN ====================
+(async function(){
+    const guardado = localStorage.getItem('usuario');
+    if (guardado) {
+        usuario = JSON.parse(guardado);
+        mostrarPerfil();
+    }
+    mostrarMensajes();
+    dibujarJuego();
+})();
 </script>
+
+</body>
+</html>

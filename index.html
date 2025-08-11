@@ -1,127 +1,222 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mini Comunidad con Juego</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        background: linear-gradient(135deg, #1565c0 60%, #42a5f5 100%);
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    header {
-        background: #333;
-        color: #fff;
-        padding: 10px;
-        width: 100%;
-        text-align: center;
-    }
-    header img {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        vertical-align: middle;
-        margin-right: 10px;
-    }
-    .container {
-        max-width: 900px;
-        width: 100%;
-        padding: 15px;
-        background: white;
-        margin-top: 15px;
-        border-radius: 10px;
-    }
-    h2 { margin-top: 0; }
-    .avatar-picker {
-        display: grid;
-        grid-template-columns: repeat(5, 60px);
-        gap: 5px;
-    }
-    .avatar-picker div {
-        width: 60px;
-        height: 60px;
-        background-image: url('avatares.png');
-        background-size: cover;
-        cursor: pointer;
-        border: 2px solid transparent;
-    }
-    .avatar-picker div.selected {
-        border-color: blue;
-    }
-    #chat-box {
-        height: 200px;
-        overflow-y: auto;
-        border: 1px solid #ccc;
-        padding: 5px;
-        background: #fafafa;
-        margin-bottom: 10px;
-    }
-    .mensaje {
-        display: flex;
-        align-items: center;
-        margin-bottom: 5px;
-    }
-    .mensaje img {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        margin-right: 5px;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
-    table, th, td {
-        border: 1px solid #aaa;
-        padding: 5px;
-        text-align: center;
-    }
-    canvas {
-        background: lightblue;
-        display: block;
-        margin: 10px auto;
-    }
-    button {
-        background-color: #1976d2;
-        color: #fff;
-        padding: 12px 28px;
-        border: none;
-        border-radius: 8px;
-        font-size: 1.1em;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(21,101,192,0.2);
-        transition: transform 0.2s, background 0.2s;
-        margin: 5px;
-        font-family: 'Comic Sans MS', Arial, sans-serif;
-    }
-    button:hover {
-        background-color: #42a5f5;
-        transform: scale(1.08) rotate(-2deg);
-        box-shadow: 0 4px 16px rgba(33,150,243,0.3);
-    }
-    button:active {
-        background-color: #0d47a1;
-        transform: scale(0.96);
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Pruebas - EbaldoS199</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #1565c0 60%, #42a5f5 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .login-box, .main-content {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 40px;
+            box-shadow: 0 2px 16px rgba(33,150,243,0.15);
+            width: 350px;
+            max-width: 90vw;
+        }
+        .login-box input {
+            padding: 8px;
+            margin-bottom: 10px;
+            width: 100%;
+            font-size: 1em;
+            border-radius: 6px;
+            border: 1px solid #aaa;
+        }
+        .login-box button {
+            width: 100%;
+        }
+        h2 {
+            color: #1565c0;
+            margin-top: 0;
+        }
+        .card {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 6px rgba(33,150,243,0.07);
+        }
+        .opinions, .chat, .game {
+            margin-bottom: 20px;
+        }
+        .opinions-list, .chat-messages {
+            max-height: 150px;
+            overflow-y: auto;
+            background: #f7f7f7;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 0.98em;
+        }
+        .opinion-item, .chat-msg {
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .opinion-item:last-child, .chat-msg:last-child {
+            border-bottom: none;
+        }
+        .game-score {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #1976d2;
+        }
+        button {
+            background-color: #1976d2;
+            color: #fff;
+            padding: 10px 22px;
+            border: none;
+            border-radius: 7px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            margin: 5px 0;
+            font-family: 'Comic Sans MS', Arial, sans-serif;
+            box-shadow: 0 2px 8px rgba(21,101,192,0.11);
+        }
+        button:hover {
+            background-color: #42a5f5;
+            transform: scale(1.05) rotate(-2deg);
+            box-shadow: 0 4px 16px rgba(33,150,243,0.11);
+        }
+        button:active {
+            background-color: #0d47a1;
+            transform: scale(0.96);
+        }
+        label {
+            font-weight: bold;
+            color: #1976d2;
+        }
+    </style>
 </head>
 <body>
-<header>
-    <img src="https://ebaldos199.github.io/mi-primera-pagina/foto_perfil.jpg" alt="Foto perfil">
-    <span>Bienvenido a la Mini Comunidad</span>
-</header>
-<div class="container">
-    <h2>¡Participa en la Comunidad!</h2>
-    <button>💬 Chatea aquí</button>
-    <button>🎮 Juega ahora</button>
-    <button>👤 Cambia tu avatar</button>
-    <!-- Puedes poner aquí el resto de tu contenido, chat, juego, tabla, etc. -->
-</div>
+    <div class="login-box" id="loginBox">
+        <h2>Iniciar Sesión</h2>
+        <label for="username">Nombre:</label>
+        <input type="text" id="username" placeholder="Escribe tu nombre" autocomplete="off">
+        <button onclick="login()">Acceder</button>
+    </div>
+
+    <div class="main-content" id="mainContent" style="display:none;">
+        <div class="card">
+            <h2>¡Bienvenido a mi plataforma de pruebas!</h2>
+            <p>
+                Estimado visitante,<br><br>
+                Mi nombre es <span id="nombreUsuario"></span> y quiero darte la bienvenida a este ambiente de pruebas. 
+                Aquí estoy aplicando las tecnologías necesarias para convertirme en un desarrollador web profesional.<br><br>
+                Esta plataforma está pensada para que explores mis habilidades, opines sobre el sitio y participes en las funciones interactivas que he construido.<br>
+                <b>¡Tu feedback es muy valioso para mí!</b>
+            </p>
+            <p>
+                <i>
+                    Soy un apasionado de la programación y el desarrollo web. Me esfuerzo cada día por aprender nuevas tecnologías y poner en práctica mis conocimientos. Esta página es una muestra de lo que puedo hacer, y tu opinión me ayuda a mejorar.<br>
+                    Gracias por visitar mi plataforma, ¡espero que disfrutes la experiencia!
+                </i>
+            </p>
+        </div>
+
+        <div class="opinions">
+            <h3>Deja tu opinión sobre la página:</h3>
+            <div class="opinions-list" id="opinionsList"></div>
+            <input type="text" id="opinionInput" placeholder="Escribe tu comentario..." autocomplete="off">
+            <button onclick="addOpinion()">Publicar opinión</button>
+        </div>
+
+        <div class="chat">
+            <h3>Mini Chat en tiempo real</h3>
+            <div class="chat-messages" id="chatMessages"></div>
+            <input type="text" id="chatInput" placeholder="Escribe un mensaje..." autocomplete="off">
+            <button onclick="sendChat()">Enviar</button>
+        </div>
+
+        <div class="game">
+            <h3>Mini Juego de Clics</h3>
+            <div class="game-score" id="gameScore">Puntos: 0</div>
+            <button onclick="addPoint()">¡Sumar punto!</button>
+            <button onclick="resetPoints()">Reiniciar puntaje</button>
+        </div>
+    </div>
+
+    <script>
+        let username = "";
+        // Opiniones y chat almacenados en arrays locales (no persisten si recargas)
+        let opinions = [];
+        let chatMessages = [];
+        let points = 0;
+
+        // LOGIN
+        function login() {
+            const input = document.getElementById("username").value.trim();
+            if (input.length === 0) {
+                alert("Por favor, escribe tu nombre.");
+                return;
+            }
+            username = input;
+            document.getElementById("loginBox").style.display = "none";
+            document.getElementById("mainContent").style.display = "block";
+            document.getElementById("nombreUsuario").innerText = username;
+        }
+
+        // OPINIONES
+        function addOpinion() {
+            const opinionText = document.getElementById("opinionInput").value.trim();
+            if (opinionText.length === 0) return;
+            opinions.push({ name: username, text: opinionText });
+            renderOpinions();
+            document.getElementById("opinionInput").value = "";
+        }
+        function renderOpinions() {
+            const list = document.getElementById("opinionsList");
+            list.innerHTML = "";
+            opinions.forEach(o => {
+                const div = document.createElement("div");
+                div.className = "opinion-item";
+                div.innerHTML = `<b>${o.name}:</b> ${o.text}`;
+                list.appendChild(div);
+            });
+        }
+
+        // MINI CHAT
+        function sendChat() {
+            const chatText = document.getElementById("chatInput").value.trim();
+            if (chatText.length === 0) return;
+            chatMessages.push({ name: username, text: chatText });
+            renderChat();
+            document.getElementById("chatInput").value = "";
+        }
+        function renderChat() {
+            const list = document.getElementById("chatMessages");
+            list.innerHTML = "";
+            chatMessages.forEach(m => {
+                const div = document.createElement("div");
+                div.className = "chat-msg";
+                div.innerHTML = `<b>${m.name}:</b> ${m.text}`;
+                list.appendChild(div);
+            });
+            list.scrollTop = list.scrollHeight;
+        }
+
+        // MINI JUEGO
+        function addPoint() {
+            points++;
+            updateScore();
+        }
+        function resetPoints() {
+            points = 0;
+            updateScore();
+        }
+        function updateScore() {
+            document.getElementById("gameScore").innerText = "Puntos: " + points;
+        }
+    </script>
 </body>
 </html>

@@ -8,7 +8,8 @@
     body {
         font-family: Arial, sans-serif;
         margin: 0;
-        background: #f4f4f4;
+        background: linear-gradient(135deg, #1565c0 60%, #42a5f5 100%);
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -86,209 +87,41 @@
         display: block;
         margin: 10px auto;
     }
+    button {
+        background-color: #1976d2;
+        color: #fff;
+        padding: 12px 28px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1em;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(21,101,192,0.2);
+        transition: transform 0.2s, background 0.2s;
+        margin: 5px;
+        font-family: 'Comic Sans MS', Arial, sans-serif;
+    }
+    button:hover {
+        background-color: #42a5f5;
+        transform: scale(1.08) rotate(-2deg);
+        box-shadow: 0 4px 16px rgba(33,150,243,0.3);
+    }
+    button:active {
+        background-color: #0d47a1;
+        transform: scale(0.96);
+    }
 </style>
 </head>
 <body>
-
 <header>
-    <img src="foto_perfil.jpg" alt="Foto perfil">
+    <img src="https://ebaldos199.github.io/mi-primera-pagina/foto_perfil.jpg" alt="Foto perfil">
     <span>Bienvenido a la Mini Comunidad</span>
 </header>
-
-<div class="container" id="registro-container">
-    <h2>Registro de Usuario</h2>
-    <input type="text" id="nombre" placeholder="Ingresa tu nombre"><br><br>
-    <p>Selecciona tu avatar:</p>
-    <div class="avatar-picker" id="avatar-picker"></div>
-    <br>
-    <button onclick="registrarUsuario()">Registrarme</button>
+<div class="container">
+    <h2>¡Participa en la Comunidad!</h2>
+    <button>💬 Chatea aquí</button>
+    <button>🎮 Juega ahora</button>
+    <button>👤 Cambia tu avatar</button>
+    <!-- Puedes poner aquí el resto de tu contenido, chat, juego, tabla, etc. -->
 </div>
-
-<div class="container" id="perfil-container" style="display:none;">
-    <h2>Perfil</h2>
-    <img id="perfil-avatar" src="" width="60" height="60" style="border-radius:50%;"> 
-    <span id="perfil-nombre"></span>
-    <button onclick="cerrarSesion()" style="float:right;">Cerrar sesión</button>
-</div>
-
-<div class="container" id="chat-container" style="display:none;">
-    <h2>Mini Chat</h2>
-    <div id="chat-box"></div>
-    <input type="text" id="mensaje" placeholder="Escribe un mensaje">
-    <button onclick="enviarMensaje()">Enviar</button>
-</div>
-
-<div class="container" id="juego-container" style="display:none;">
-    <h2>Mini Juego - Atrapa el cuadrado</h2>
-    <canvas id="juego" width="300" height="300"></canvas>
-    <p>Puntaje: <span id="puntaje">0</span></p>
-    <button onclick="iniciarJuego()">Jugar de nuevo</button>
-    <h3>Tabla de récords</h3>
-    <table id="tabla-records">
-        <thead>
-            <tr><th>Jugador</th><th>Avatar</th><th>Puntaje</th></tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-</div>
-
-<script>
-// ==================== VARIABLES GLOBALES ====================
-let usuario = null;
-let avatarSeleccionado = null;
-
-// ==================== CARGAR AVATARES ====================
-function cargarAvatares() {
-    const picker = document.getElementById('avatar-picker');
-    for (let i = 0; i < 10; i++) {
-        let div = document.createElement('div');
-        div.style.backgroundPosition = `-${i * 60}px 0`;
-        div.onclick = function() {
-            document.querySelectorAll('.avatar-picker div').forEach(el => el.classList.remove('selected'));
-            div.classList.add('selected');
-            avatarSeleccionado = i;
-        };
-        picker.appendChild(div);
-    }
-}
-cargarAvatares();
-
-// ==================== REGISTRO ====================
-function registrarUsuario() {
-    const nombre = document.getElementById('nombre').value.trim();
-    if (!nombre || avatarSeleccionado === null) {
-        alert("Debes ingresar un nombre y elegir un avatar");
-        return;
-    }
-    usuario = { nombre, avatar: avatarSeleccionado };
-    localStorage.setItem('usuario', JSON.stringify(usuario));
-    mostrarPerfil();
-}
-
-function mostrarPerfil() {
-    document.getElementById('registro-container').style.display = 'none';
-    document.getElementById('perfil-container').style.display = 'block';
-    document.getElementById('chat-container').style.display = 'block';
-    document.getElementById('juego-container').style.display = 'block';
-
-    document.getElementById('perfil-nombre').innerText = usuario.nombre;
-    document.getElementById('perfil-avatar').src = obtenerAvatar(usuario.avatar);
-    cargarRecords();
-}
-
-function cerrarSesion() {
-    localStorage.removeItem('usuario');
-    location.reload();
-}
-
-function obtenerAvatar(index) {
-    // Devuelve una imagen recortada del sprite
-    let canvas = document.createElement('canvas');
-    canvas.width = 60;
-    canvas.height = 60;
-    let ctx = canvas.getContext('2d');
-    let img = new Image();
-    img.src = 'avatares.png';
-    return new Promise(resolve => {
-        img.onload = () => {
-            ctx.drawImage(img, index * 60, 0, 60, 60, 0, 0, 60, 60);
-            resolve(canvas.toDataURL());
-        };
-    });
-}
-
-// ==================== CHAT ====================
-let mensajes = JSON.parse(localStorage.getItem('mensajes')) || [];
-
-async function enviarMensaje() {
-    const texto = document.getElementById('mensaje').value.trim();
-    if (!texto) return;
-    const avatarData = await obtenerAvatar(usuario.avatar);
-    mensajes.push({ nombre: usuario.nombre, avatar: avatarData, texto });
-    localStorage.setItem('mensajes', JSON.stringify(mensajes));
-    document.getElementById('mensaje').value = '';
-    mostrarMensajes();
-}
-
-function mostrarMensajes() {
-    const chatBox = document.getElementById('chat-box');
-    chatBox.innerHTML = '';
-    mensajes.forEach(msg => {
-        const div = document.createElement('div');
-        div.classList.add('mensaje');
-        div.innerHTML = `<img src="${msg.avatar}"><strong>${msg.nombre}:</strong> ${msg.texto}`;
-        chatBox.appendChild(div);
-    });
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-// ==================== MINI JUEGO ====================
-let puntaje = 0;
-let objetivo = { x: 50, y: 50, size: 30 };
-
-function iniciarJuego() {
-    puntaje = 0;
-    document.getElementById('puntaje').innerText = puntaje;
-    dibujarJuego();
-}
-
-function dibujarJuego() {
-    const canvas = document.getElementById('juego');
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    ctx.fillStyle = 'red';
-    ctx.fillRect(objetivo.x, objetivo.y, objetivo.size, objetivo.size);
-}
-
-document.getElementById('juego').addEventListener('click', e => {
-    const rect = e.target.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    if (x >= objetivo.x && x <= objetivo.x + objetivo.size && y >= objetivo.y && y <= objetivo.y + objetivo.size) {
-        puntaje++;
-        document.getElementById('puntaje').innerText = puntaje;
-        objetivo.x = Math.random() * (300 - objetivo.size);
-        objetivo.y = Math.random() * (300 - objetivo.size);
-        dibujarJuego();
-    }
-    if (puntaje >= 5) {
-        guardarRecord();
-    }
-});
-
-// ==================== TABLA DE RÉCORDS ====================
-let records = JSON.parse(localStorage.getItem('records')) || [];
-
-async function guardarRecord() {
-    const avatarData = await obtenerAvatar(usuario.avatar);
-    records.push({ nombre: usuario.nombre, avatar: avatarData, puntaje });
-    records.sort((a,b) => b.puntaje - a.puntaje);
-    localStorage.setItem('records', JSON.stringify(records));
-    cargarRecords();
-}
-
-function cargarRecords() {
-    const tbody = document.querySelector('#tabla-records tbody');
-    tbody.innerHTML = '';
-    records.forEach(r => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${r.nombre}</td><td><img src="${r.avatar}" width="30" height="30"></td><td>${r.puntaje}</td>`;
-        tbody.appendChild(tr);
-    });
-}
-
-// ==================== AUTO LOGIN ====================
-(async function(){
-    const guardado = localStorage.getItem('usuario');
-    if (guardado) {
-        usuario = JSON.parse(guardado);
-        mostrarPerfil();
-    }
-    mostrarMensajes();
-    dibujarJuego();
-})();
-</script>
-
 </body>
 </html>

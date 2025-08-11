@@ -257,4 +257,104 @@
             chatMessages.push({ name: username, text: chatText });
             if (chatMessages.length > 25) chatMessages = chatMessages.slice(-25);
             renderChat();
+            document.getElementById("chatInput").value = "";
+        }
+        function renderChat() {
+            const list = document.getElementById("chatMessages");
+            list.innerHTML = "";
+            chatMessages.forEach(m => {
+                const div = document.createElement("div");
+                div.className = "chat-msg";
+                div.innerHTML = `<b>${m.name}:</b> ${m.text}`;
+                list.appendChild(div);
+            });
+            list.scrollTop = list.scrollHeight;
+        }
 
+        // ---- MINI JUEGO DE GLOBOS ----
+        function setupCanvas() {
+            canvas = document.getElementById("balloonCanvas");
+            ctx = canvas.getContext("2d");
+            balloons = [];
+            points = 0;
+            updateScore();
+            canvas.onclick = canvasClick;
+            started = false;
+            if(gameInterval) clearInterval(gameInterval);
+        }
+        function startGame() {
+            setupCanvas();
+            started = true;
+            // Más globos y más rápido
+            gameInterval = setInterval(spawnBalloon, 550);
+            requestAnimationFrame(updateGame);
+        }
+        function spawnBalloon() {
+            let x = Math.random() * (canvas.width - balloonRadius*2) + balloonRadius;
+            let color = balloonColors[Math.floor(Math.random()*balloonColors.length)];
+            let speed = balloonSpeed[Math.floor(Math.random()*balloonSpeed.length)];
+            balloons.push({
+                x: x,
+                y: canvas.height + balloonRadius,
+                color: color,
+                speed: speed,
+                radius: balloonRadius
+            });
+        }
+        function updateGame() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            // Mover globos
+            for(let i=balloons.length-1;i>=0;i--) {
+                balloons[i].y -= balloons[i].speed;
+                drawBalloon(balloons[i]);
+                if(balloons[i].y + balloons[i].radius < 0) {
+                    balloons.splice(i,1);
+                }
+            }
+            if(started) requestAnimationFrame(updateGame);
+        }
+        function drawBalloon(balloon) {
+            ctx.beginPath();
+            ctx.arc(balloon.x, balloon.y, balloon.radius, 0, Math.PI*2);
+            ctx.fillStyle = balloon.color;
+            ctx.shadowColor = "#00000033";
+            ctx.shadowBlur = 6;
+            ctx.fill();
+            ctx.strokeStyle = "#888";
+            ctx.lineWidth = 2.2;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+            // Cuerda
+            ctx.beginPath();
+            ctx.moveTo(balloon.x, balloon.y + balloon.radius);
+            ctx.lineTo(balloon.x, balloon.y + balloon.radius + 16);
+            ctx.strokeStyle = "#888";
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+        }
+        function canvasClick(e) {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            for(let i=balloons.length-1;i>=0;i--) {
+                let b = balloons[i];
+                let dx = mouseX - b.x;
+                let dy = mouseY - b.y;
+                if(dx*dx + dy*dy <= b.radius*b.radius) {
+                    balloons.splice(i,1);
+                    points++;
+                    updateScore();
+                    break;
+                }
+            }
+        }
+        function resetPoints() {
+            points = 0;
+            updateScore();
+        }
+        function updateScore() {
+            document.getElementById("gameScore").innerText = "Puntos: " + points;
+        }
+    </script>
+</body>
+</html>

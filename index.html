@@ -6,56 +6,81 @@
     <title>Plataforma de Pruebas - EbaldoS199</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             margin: 0;
-            background: linear-gradient(135deg, #1565c0 60%, #42a5f5 100%);
+            background: linear-gradient(135deg, #42a5f5 0%, #ab47bc 40%, #fbc02d 80%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
         .login-box, .main-content {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
+            background: rgba(255,255,255,0.97);
+            border-radius: 18px;
+            padding: 24px;
             margin-top: 40px;
-            box-shadow: 0 2px 16px rgba(33,150,243,0.15);
-            width: 350px;
-            max-width: 90vw;
+            box-shadow: 0 4px 32px rgba(33,150,243,0.18);
+            width: 370px;
+            max-width: 98vw;
+        }
+        .perfil-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .perfil-box img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid #ab47bc;
+            box-shadow: 0 4px 24px #9e9e9e60;
+            background: linear-gradient(135deg, #fffde4 0%, #ffdde1 100%);
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+        .perfil-box .nombre-perfil {
+            font-size: 1.35em;
+            font-weight: bold;
+            color: #ab47bc;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 5px #efd6ff90;
+            margin-bottom: 3px;
         }
         .login-box input {
             padding: 8px;
             margin-bottom: 10px;
             width: 100%;
             font-size: 1em;
-            border-radius: 6px;
+            border-radius: 7px;
             border: 1px solid #aaa;
         }
         .login-box button {
             width: 100%;
         }
         h2 {
-            color: #1565c0;
+            color: #42a5f5;
             margin-top: 0;
         }
         .card {
-            background: #e3f2fd;
+            background: linear-gradient(135deg,#e3f2fd 70%,#f8bbd0 100%);
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 12px;
             margin-bottom: 20px;
-            box-shadow: 0 1px 6px rgba(33,150,243,0.07);
+            box-shadow: 0 1px 10px rgba(33,150,243,0.13);
         }
         .opinions, .chat, .game {
-            margin-bottom: 20px;
+            margin-bottom: 22px;
         }
         .opinions-list, .chat-messages {
             max-height: 150px;
             overflow-y: auto;
             background: #f7f7f7;
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 10px;
             margin-bottom: 10px;
             font-size: 0.98em;
+            border: 1.5px solid #ab47bc30;
         }
         .opinion-item, .chat-msg {
             margin-bottom: 8px;
@@ -68,8 +93,9 @@
         .game-score {
             font-size: 1.2em;
             font-weight: bold;
-            color: #1976d2;
+            color: #fbc02d;
             margin-bottom: 10px;
+            text-shadow: 0 2px 8px #ab47bc33;
         }
         .game-canvas-box {
             display: flex;
@@ -77,36 +103,47 @@
             align-items: center;
         }
         canvas {
-            background: #b3e5fc;
-            border: 2px solid #1976d2;
-            border-radius: 12px;
+            background: linear-gradient(135deg, #b3e5fc 80%, #ffe0b2 100%);
+            border: 2.5px solid #ab47bc;
+            border-radius: 14px;
             margin-bottom: 8px;
+            box-shadow: 0 2px 12px #42a5f570;
         }
-        button {
-            background-color: #1976d2;
+        .modern-btn {
+            background: linear-gradient(135deg,#ab47bc 70%,#fbc02d 100%);
             color: #fff;
-            padding: 10px 22px;
+            padding: 12px 28px;
             border: none;
-            border-radius: 7px;
+            border-radius: 9px;
             font-size: 1em;
             cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
+            transition: transform 0.19s, box-shadow 0.22s;
             margin: 5px 0;
-            font-family: 'Comic Sans MS', Arial, sans-serif;
-            box-shadow: 0 2px 8px rgba(21,101,192,0.11);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            box-shadow: 0 2px 12px #ab47bc55;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            background-size: 160% 160%;
+            background-position: left top;
         }
-        button:hover {
-            background-color: #42a5f5;
-            transform: scale(1.05) rotate(-2deg);
-            box-shadow: 0 4px 16px rgba(33,150,243,0.11);
+        .modern-btn:hover {
+            background-position: right bottom;
+            transform: scale(1.07) rotate(-1deg);
+            box-shadow: 0 8px 24px #ab47bc99;
         }
-        button:active {
-            background-color: #0d47a1;
+        .modern-btn:active {
+            background-position: left top;
+            background: linear-gradient(135deg,#42a5f5 70%,#ab47bc 100%);
             transform: scale(0.96);
         }
         label {
             font-weight: bold;
-            color: #1976d2;
+            color: #ab47bc;
+        }
+        #gameHelp {
+            font-size:0.97em;
+            color:#42a5f5;
+            text-align:center;
         }
     </style>
 </head>
@@ -115,12 +152,13 @@
         <h2>Iniciar Sesión</h2>
         <label for="username">Nombre:</label>
         <input type="text" id="username" placeholder="Escribe tu nombre" autocomplete="off">
-        <button onclick="login()">Acceder</button>
+        <button class="modern-btn" onclick="login()">Acceder</button>
     </div>
 
     <div class="main-content" id="mainContent" style="display:none;">
-        <div style="text-align:center;">
-            <img src="foto_perfil.jpg" alt="Foto perfil" style="width:80px; height:80px; border-radius:50%; margin-bottom:10px;">
+        <div class="perfil-box">
+            <img src="foto_perfil.jpg" alt="Foto perfil">
+            <div class="nombre-perfil">EBALDO SIERRA SIERR</div>
         </div>
         <div class="card">
             <h2>¡Bienvenido a mi plataforma de pruebas!</h2>
@@ -143,24 +181,25 @@
             <h3>Deja tu opinión sobre la página:</h3>
             <div class="opinions-list" id="opinionsList"></div>
             <input type="text" id="opinionInput" placeholder="Escribe tu comentario..." autocomplete="off">
-            <button onclick="addOpinion()">Publicar opinión</button>
+            <button class="modern-btn" onclick="addOpinion()">Publicar opinión</button>
         </div>
 
         <div class="chat">
             <h3>Mini Chat en tiempo real</h3>
             <div class="chat-messages" id="chatMessages"></div>
             <input type="text" id="chatInput" placeholder="Escribe un mensaje..." autocomplete="off">
-            <button onclick="sendChat()">Enviar</button>
+            <button class="modern-btn" onclick="sendChat()">Enviar</button>
         </div>
 
         <div class="game">
             <h3>Mini Juego: ¡Explota los Globos!</h3>
             <div class="game-score" id="gameScore">Puntos: 0</div>
             <div class="game-canvas-box">
-                <canvas id="balloonCanvas" width="320" height="350"></canvas>
-                <button onclick="resetPoints()">Reiniciar puntaje</button>
+                <canvas id="balloonCanvas" width="340" height="380"></canvas>
+                <button class="modern-btn" id="startGameBtn" onclick="startGame()">¡Start!</button>
+                <button class="modern-btn" onclick="resetPoints()">Reiniciar puntaje</button>
             </div>
-            <div id="gameHelp" style="font-size:0.95em;color:#1976d2;">Haz clic en los globos que suben para explotarlos y sumar puntos.</div>
+            <div id="gameHelp">Haz clic en los globos que suben para explotarlos y sumar puntos. ¡Presiona Start para mayor velocidad!</div>
         </div>
     </div>
 
@@ -172,9 +211,11 @@
         let points = 0;
         let balloons = [];
         let canvas, ctx;
-        let balloonColors = ["#e57373","#81c784","#64b5f6","#ffd54f","#ba68c8"];
-        let balloonRadius = 20;
-        let balloonSpeed = [1.2, 1.5, 1.7, 2, 2.2];
+        let balloonColors = ["#e57373","#81c784","#64b5f6","#ffd54f","#ba68c8","#ff8a65","#43a047","#f06292","#8d6e63","#d4e157"];
+        let balloonRadius = 22;
+        let balloonSpeed = [2.2, 2.5, 2.7, 3.0, 3.2, 3.5];
+        let gameInterval = null;
+        let started = false;
 
         // LOGIN
         function login() {
@@ -187,7 +228,7 @@
             document.getElementById("loginBox").style.display = "none";
             document.getElementById("mainContent").style.display = "block";
             document.getElementById("nombreUsuario").innerText = username;
-            startGame();
+            setupCanvas();
         }
 
         // OPINIONES
@@ -209,102 +250,11 @@
             });
         }
 
-        // MINI CHAT
+        // MINI CHAT -- LIMITADO A 25 MENSAJES
         function sendChat() {
             const chatText = document.getElementById("chatInput").value.trim();
             if (chatText.length === 0) return;
             chatMessages.push({ name: username, text: chatText });
+            if (chatMessages.length > 25) chatMessages = chatMessages.slice(-25);
             renderChat();
-            document.getElementById("chatInput").value = "";
-        }
-        function renderChat() {
-            const list = document.getElementById("chatMessages");
-            list.innerHTML = "";
-            chatMessages.forEach(m => {
-                const div = document.createElement("div");
-                div.className = "chat-msg";
-                div.innerHTML = `<b>${m.name}:</b> ${m.text}`;
-                list.appendChild(div);
-            });
-            list.scrollTop = list.scrollHeight;
-        }
 
-        // ---- MINI JUEGO DE GLOBOS ----
-        function startGame() {
-            canvas = document.getElementById("balloonCanvas");
-            ctx = canvas.getContext("2d");
-            balloons = [];
-            points = 0;
-            updateScore();
-            canvas.onclick = canvasClick;
-            // Lanzar globos cada cierto tiempo
-            setInterval(spawnBalloon, 1100);
-            requestAnimationFrame(updateGame);
-        }
-        function spawnBalloon() {
-            let x = Math.random() * (canvas.width - balloonRadius*2) + balloonRadius;
-            let color = balloonColors[Math.floor(Math.random()*balloonColors.length)];
-            let speed = balloonSpeed[Math.floor(Math.random()*balloonSpeed.length)];
-            balloons.push({
-                x: x,
-                y: canvas.height + balloonRadius,
-                color: color,
-                speed: speed,
-                radius: balloonRadius
-            });
-        }
-        function updateGame() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            // Mover globos
-            for(let i=balloons.length-1;i>=0;i--) {
-                balloons[i].y -= balloons[i].speed;
-                // Dibuja
-                drawBalloon(balloons[i]);
-                // Sale por arriba
-                if(balloons[i].y + balloons[i].radius < 0) {
-                    balloons.splice(i,1);
-                }
-            }
-            requestAnimationFrame(updateGame);
-        }
-        function drawBalloon(balloon) {
-            ctx.beginPath();
-            ctx.arc(balloon.x, balloon.y, balloon.radius, 0, Math.PI*2);
-            ctx.fillStyle = balloon.color;
-            ctx.fill();
-            ctx.strokeStyle = "#888";
-            ctx.stroke();
-            // Cuerda
-            ctx.beginPath();
-            ctx.moveTo(balloon.x, balloon.y + balloon.radius);
-            ctx.lineTo(balloon.x, balloon.y + balloon.radius + 16);
-            ctx.strokeStyle = "#888";
-            ctx.stroke();
-        }
-        function canvasClick(e) {
-            // Detecta si hizo click en algún globo
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-            for(let i=balloons.length-1;i>=0;i--) {
-                let b = balloons[i];
-                let dx = mouseX - b.x;
-                let dy = mouseY - b.y;
-                if(dx*dx + dy*dy <= b.radius*b.radius) {
-                    balloons.splice(i,1); // Explota
-                    points++;
-                    updateScore();
-                    break;
-                }
-            }
-        }
-        function resetPoints() {
-            points = 0;
-            updateScore();
-        }
-        function updateScore() {
-            document.getElementById("gameScore").innerText = "Puntos: " + points;
-        }
-    </script>
-</body>
-</html>

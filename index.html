@@ -69,6 +69,18 @@
             font-size: 1.2em;
             font-weight: bold;
             color: #1976d2;
+            margin-bottom: 10px;
+        }
+        .game-canvas-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        canvas {
+            background: #b3e5fc;
+            border: 2px solid #1976d2;
+            border-radius: 12px;
+            margin-bottom: 8px;
         }
         button {
             background-color: #1976d2;
@@ -107,6 +119,9 @@
     </div>
 
     <div class="main-content" id="mainContent" style="display:none;">
+        <div style="text-align:center;">
+            <img src="foto_perfil.jpg" alt="Foto perfil" style="width:80px; height:80px; border-radius:50%; margin-bottom:10px;">
+        </div>
         <div class="card">
             <h2>¡Bienvenido a mi plataforma de pruebas!</h2>
             <p>
@@ -139,19 +154,27 @@
         </div>
 
         <div class="game">
-            <h3>Mini Juego de Clics</h3>
+            <h3>Mini Juego: ¡Explota los Globos!</h3>
             <div class="game-score" id="gameScore">Puntos: 0</div>
-            <button onclick="addPoint()">¡Sumar punto!</button>
-            <button onclick="resetPoints()">Reiniciar puntaje</button>
+            <div class="game-canvas-box">
+                <canvas id="balloonCanvas" width="320" height="350"></canvas>
+                <button onclick="resetPoints()">Reiniciar puntaje</button>
+            </div>
+            <div id="gameHelp" style="font-size:0.95em;color:#1976d2;">Haz clic en los globos que suben para explotarlos y sumar puntos.</div>
         </div>
     </div>
 
     <script>
         let username = "";
-        // Opiniones y chat almacenados en arrays locales (no persisten si recargas)
         let opinions = [];
         let chatMessages = [];
+        // ---- Juego de Explota Globos ----
         let points = 0;
+        let balloons = [];
+        let canvas, ctx;
+        let balloonColors = ["#e57373","#81c784","#64b5f6","#ffd54f","#ba68c8"];
+        let balloonRadius = 20;
+        let balloonSpeed = [1.2, 1.5, 1.7, 2, 2.2];
 
         // LOGIN
         function login() {
@@ -164,6 +187,7 @@
             document.getElementById("loginBox").style.display = "none";
             document.getElementById("mainContent").style.display = "block";
             document.getElementById("nombreUsuario").innerText = username;
+            startGame();
         }
 
         // OPINIONES
@@ -205,10 +229,74 @@
             list.scrollTop = list.scrollHeight;
         }
 
-        // MINI JUEGO
-        function addPoint() {
-            points++;
+        // ---- MINI JUEGO DE GLOBOS ----
+        function startGame() {
+            canvas = document.getElementById("balloonCanvas");
+            ctx = canvas.getContext("2d");
+            balloons = [];
+            points = 0;
             updateScore();
+            canvas.onclick = canvasClick;
+            // Lanzar globos cada cierto tiempo
+            setInterval(spawnBalloon, 1100);
+            requestAnimationFrame(updateGame);
+        }
+        function spawnBalloon() {
+            let x = Math.random() * (canvas.width - balloonRadius*2) + balloonRadius;
+            let color = balloonColors[Math.floor(Math.random()*balloonColors.length)];
+            let speed = balloonSpeed[Math.floor(Math.random()*balloonSpeed.length)];
+            balloons.push({
+                x: x,
+                y: canvas.height + balloonRadius,
+                color: color,
+                speed: speed,
+                radius: balloonRadius
+            });
+        }
+        function updateGame() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            // Mover globos
+            for(let i=balloons.length-1;i>=0;i--) {
+                balloons[i].y -= balloons[i].speed;
+                // Dibuja
+                drawBalloon(balloons[i]);
+                // Sale por arriba
+                if(balloons[i].y + balloons[i].radius < 0) {
+                    balloons.splice(i,1);
+                }
+            }
+            requestAnimationFrame(updateGame);
+        }
+        function drawBalloon(balloon) {
+            ctx.beginPath();
+            ctx.arc(balloon.x, balloon.y, balloon.radius, 0, Math.PI*2);
+            ctx.fillStyle = balloon.color;
+            ctx.fill();
+            ctx.strokeStyle = "#888";
+            ctx.stroke();
+            // Cuerda
+            ctx.beginPath();
+            ctx.moveTo(balloon.x, balloon.y + balloon.radius);
+            ctx.lineTo(balloon.x, balloon.y + balloon.radius + 16);
+            ctx.strokeStyle = "#888";
+            ctx.stroke();
+        }
+        function canvasClick(e) {
+            // Detecta si hizo click en algún globo
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            for(let i=balloons.length-1;i>=0;i--) {
+                let b = balloons[i];
+                let dx = mouseX - b.x;
+                let dy = mouseY - b.y;
+                if(dx*dx + dy*dy <= b.radius*b.radius) {
+                    balloons.splice(i,1); // Explota
+                    points++;
+                    updateScore();
+                    break;
+                }
+            }
         }
         function resetPoints() {
             points = 0;

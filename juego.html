@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snake + Chat</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+canvas{background:#001f54; display:block; margin:auto;}
+#chatMensajes{height:150px; overflow-y:scroll; border:1px solid #fff; padding:5px; margin-top:10px;}
+</style>
+</head>
+<body>
+<h1>Snake Game</h1>
+<canvas id="gameCanvas" width="400" height="400"></canvas>
+<p>Puntaje: <span id="puntaje">0</span></p>
+
+<div id="chatMensajes"></div>
+<form id="formChat">
+    <input type="text" id="mensajeInput" placeholder="Escribe un mensaje" required>
+    <button type="submit">Enviar</button>
+</form>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="script.js"></script>
+<script src="juego.js"></script>
+</body>
+</html>

@@ -1,26 +1,30 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presentación - Industrias Sierra</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presentación - Industrias Sierra</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <img src="foto_perfil.jpg" alt="Foto de Ebaldo Sierra" class="perfil">
-    <div class="presentacion">
-        <h1>Bienvenido a mi página</h1>
-        <p>Hola, soy Ebaldo Sierra Sierra, un apasionado del desarrollo web y videojuegos.</p>
-        <div class="links">
-            <a href="https://github.com/EbaldoS199" target="_blank">Mi GitHub</a>
-            <a href="https://linkedin.com" target="_blank">Mi LinkedIn</a>
-        </div>
-    </div>
+<h1>Bienvenido a la página</h1>
+<div class="opciones">
+    <button onclick="window.location.href='juego.html'">Jugar Snake</button>
+    <button onclick="window.location.href='juego.html#chat'">Chat</button>
+</div>
 
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="script.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="script.js"></script>
+<script>
+firebase.auth().onAuthStateChanged(user=>{
+    if(user){
+        document.querySelector("h1").textContent = `Bienvenido, ${user.email}`;
+    }else{
+        window.location.href="login.html";
+    }
+});
+</script>
 </body>
 </html>

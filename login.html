@@ -3,19 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presentación - Industrias Sierra</title>
+    <title>Login - Industrias Sierra</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <img src="foto_perfil.jpg" alt="Foto de Ebaldo Sierra" class="perfil">
-    <div class="presentacion">
-        <h1>Bienvenido a mi página</h1>
-        <p>Hola, soy Ebaldo Sierra Sierra, un apasionado del desarrollo web y videojuegos.</p>
-        <div class="links">
-            <a href="https://github.com/EbaldoS199" target="_blank">Mi GitHub</a>
-            <a href="https://linkedin.com" target="_blank">Mi LinkedIn</a>
-        </div>
-    </div>
+    <form id="loginForm">
+        <h2>Iniciar sesión</h2>
+        <input type="email" id="loginEmail" placeholder="Correo" required>
+        <input type="password" id="loginPassword" placeholder="Contraseña" required>
+        <button type="submit">Ingresar</button>
+    </form>
 
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>

@@ -3,33 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sitio Web Sierra</title>
-
-    <!-- Fuente elegante para el título -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="styles.css">
+    <title>Login con Firebase</title>
 </head>
 <body>
-    <div class="login-container">
-        <img src="foto_perfil.jpg" alt="Foto de perfil" class="perfil-img">
+    <h2>Iniciar Sesión / Registrarse</h2>
 
-        <h1 class="titulo">Bienvenido</h1>
-        <h2 class="subtitulo">Sitio Web Sierra</h2>
+    <input type="email" id="email" placeholder="Correo electrónico"><br><br>
+    <input type="password" id="password" placeholder="Contraseña"><br><br>
+    <button id="btnRegistro">Registrarse</button>
+    <button id="btnLogin">Iniciar Sesión</button>
 
-        <form>
-            <div class="input-container">
-                <span class="icono">👤</span>
-                <input type="text" placeholder="Nombre de usuario" required>
-            </div>
+    <p id="mensaje"></p>
 
-            <div class="input-container">
-                <span class="icono">🔒</span>
-                <input type="password" placeholder="Contraseña" required>
-            </div>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
 
-            <button type="submit">Iniciar Sesión</button>
-        </form>
-    </div>
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_i3J54vqqi6o_FFtyORYkPSgRf6ViaK8",
+            authDomain: "mi-primera-pagina-398ba.firebaseapp.com",
+            projectId: "mi-primera-pagina-398ba",
+            storageBucket: "mi-primera-pagina-398ba.appspot.com",
+            messagingSenderId: "407756092423",
+            appId: "1:407756092423:web:3acfcec946628bf85566a2"
+        };
+
+        // Inicializar Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Registro de usuarios
+        document.getElementById("btnRegistro").addEventListener("click", function() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    const user = userCredential.user;
+                    document.getElementById("mensaje").innerText = "Registro exitoso ✅";
+                    
+                    // Guardar datos en Firestore
+                    return db.collection("usuarios").doc(user.uid).set({
+                        email: email,
+                        fechaRegistro: new Date()
+                    });
+                })
+                .catch(error => {
+                    document.getElementById("mensaje").innerText = "Error: " + error.message;
+                });
+        });
+
+        // Inicio de sesión
+        document.getElementById("btnLogin").addEventListener("click", function() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    document.getElementById("mensaje").innerText = "Inicio de sesión exitoso ✅";
+                    // Redirigir a página principal
+                    window.location.href = "contenido.html";
+                })
+                .catch(error => {
+                    document.getElementById("mensaje").innerText = "Error: " + error.message;
+                });
+        });
+    </script>
 </body>
 </html>

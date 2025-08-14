@@ -3,29 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Industrias Sierra - Login</title>
+    <title>Login - Sitio Web Sierra</title>
+
+    <!-- Fuente elegante para el título -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="styles.css">
-    <!-- Iconos Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="script.js" defer></script>
 </head>
 <body>
     <div class="login-container">
-        <h1 class="brand-title">
-            <span class="special-s">S</span> Industrias Sierra
-        </h1>
-        <p class="welcome-text">Bienvenido a Industrias Sierra</p>
+        <img src="foto_perfil.jpg" alt="Foto de perfil" class="perfil-img">
 
-        <form class="login-form" onsubmit="return acceder()">
-            <div class="input-group">
-                <i class="fa fa-user"></i>
-                <input type="text" placeholder="Escribe aquí tu nombre" id="username" required>
+        <h1 class="titulo">Bienvenido</h1>
+        <h2 class="subtitulo">Sitio Web Sierra</h2>
+
+        <form>
+            <div class="input-container">
+                <span class="icono">👤</span>
+                <input type="text" placeholder="Nombre de usuario" required>
             </div>
-            <div class="input-group">
-                <i class="fa fa-lock"></i>
-                <input type="password" placeholder="Escribe aquí tu contraseña" id="password" required>
+
+            <div class="input-container">
+                <span class="icono">🔒</span>
+                <input type="password" placeholder="Contraseña" required>
             </div>
-            <button type="submit" class="login-btn">Acceder</button>
+
+            <button type="submit">Iniciar Sesión</button>
         </form>
     </div>
 </body>

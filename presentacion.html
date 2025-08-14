@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentación - Industrias Sierra</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0f2c, #001f54);
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 40px;
+        }
+        .perfil {
+            max-width: 300px;
+            border-radius: 50%;
+            border: 4px solid #fuchsia;
+            margin-bottom: 20px;
+        }
+        .presentacion {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 600px;
+            margin: auto;
+        }
+        h1 {
+            color: #4ecdc4;
+        }
+        .links a {
+            color: #fuchsia;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <img src="foto-perfil.jpg" alt="Foto de Ebaldo Sierra" class="perfil">
+    <div class="presentacion">
+        <h1>Bienvenido a mi página</h1>
+        <p>Hola, soy Ebaldo Sierra Sierra, un apasionado del desarrollo web y videojuegos. Actualmente estoy estudiando tecnologías como HTML, CSS, JavaScript y Python.</p>
+        <p>Mis habilidades incluyen diseño de interfaces interactivas, programación de videojuegos en Pygame, y manejo básico de GitHub.</p>
+        <div class="links">
+            <a href="https://github.com/EbaldoS199" target="_blank">Mi GitHub</a>
+            <a href="https://linkedin.com" target="_blank">Mi LinkedIn</a>
+        </div>
+    </div>
+    <script>
+        // Recupera el nombre de usuario desde el login
+        const usuario = localStorage.getItem("usuario");
+        if (usuario) {
+            document.querySelector("h1").textContent = `Bienvenido, ${usuario}`;
+        }
+    </script>
+</body>
+</html>

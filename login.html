@@ -1,22 +1,66 @@
-<!DOCTYPE html>
+Set-Content -Path login.html -Encoding UTF8 -Value @'
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - Industrias Sierra</title>
-<link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Iniciar sesión</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-<h2>Iniciar Sesión</h2>
-<form id="loginForm">
-    <input type="email" id="loginEmail" placeholder="Correo" required>
-    <input type="password" id="loginPassword" placeholder="Contraseña" required>
-    <button type="submit">Iniciar sesión</button>
-</form>
+<body class="container">
+  <header class="nav"><a href="index.html">← Inicio</a><h1>Login</h1></header>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="firebase-config.js"></script>
-<script src="script.js"></script>
+  <main class="card">
+    <form id="loginForm" autocomplete="off">
+      <label>Usuario o Email
+        <input type="text" id="userOrEmail" required placeholder="tu usuario o correo" />
+      </label>
+      <label>Contraseña
+        <input type="password" id="password" required />
+      </label>
+      <button class="btn" type="submit">Entrar</button>
+      <p>¿No tienes cuenta? <a href="registro.html">Regístrate</a></p>
+      <p id="msg"></p>
+    </form>
+  </main>
+
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { signInWithEmailAndPassword, onAuthStateChanged } 
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { doc, getDoc } 
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const form = document.getElementById("loginForm");
+    const msg  = document.getElementById("msg");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id    = document.getElementById("userOrEmail").value.trim();
+      const pass  = document.getElementById("password").value.trim();
+
+      try {
+        let email = id;
+        if (!id.includes("@")) {
+          // username -> uid -> email (si existe) o placeholder
+          const unameSnap = await getDoc(doc(db, "usernames", id.toLowerCase()));
+          if (!unameSnap.exists()) throw new Error("Usuario no encontrado.");
+          const uid = unameSnap.data().uid;
+          const userDoc = await getDoc(doc(db, "users", uid));
+          const storedEmail = userDoc.exists() ? userDoc.data().email : null;
+          email = storedEmail || `${id.toLowerCase()}+noemail@placeholder.local`;
+        }
+        await signInWithEmailAndPassword(auth, email, pass);
+        location.href = "presentacion.html";
+      } catch (err) {
+        msg.textContent = err.message;
+      }
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) location.href = "presentacion.html";
+    });
+  </script>
 </body>
 </html>
+'@

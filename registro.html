@@ -1,22 +1,85 @@
-<!DOCTYPE html>
+Set-Content -Path registro.html -Encoding UTF8 -Value @'
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registro - Industrias Sierra</title>
-<link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registrarse</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-<h2>Registro de Usuario</h2>
-<form id="registerForm">
-    <input type="email" id="regEmail" placeholder="Correo" required>
-    <input type="password" id="regPassword" placeholder="Contraseña" required>
-    <button type="submit">Registrarse</button>
-</form>
+<body class="container">
+  <header class="nav"><a href="login.html">← Iniciar sesión</a><h1>Crear cuenta</h1></header>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="firebase-config.js"></script>
-<script src="script.js"></script>
+  <main class="card">
+    <form id="registerForm" autocomplete="off">
+      <label>Nombre de usuario (único)
+        <input type="text" id="username" minlength="3" required placeholder="ej: evaldo_dev" />
+      </label>
+      <label>Email (opcional pero recomendado)
+        <input type="email" id="email" placeholder="ej: tu@correo.com" />
+      </label>
+      <label>Contraseña
+        <input type="password" id="password" minlength="6" required />
+      </label>
+      <label>Confirmar contraseña
+        <input type="password" id="confirm" minlength="6" required />
+      </label>
+
+      <button class="btn" type="submit">Registrarme</button>
+      <p id="msg"></p>
+    </form>
+  </main>
+
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { createUserWithEmailAndPassword, updateProfile } 
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { doc, getDoc, setDoc, serverTimestamp } 
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const form = document.getElementById("registerForm");
+    const msg  = document.getElementById("msg");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("username").value.trim().toLowerCase();
+      const email    = document.getElementById("email").value.trim();
+      const pass     = document.getElementById("password").value.trim();
+      const confirm  = document.getElementById("confirm").value.trim();
+
+      if (pass !== confirm) { msg.textContent = "Las contraseñas no coinciden."; return; }
+      if (!/^[a-z0-9_\.]{3,20}$/.test(username)) { 
+        msg.textContent = "El usuario solo letras/números/._ y 3-20 caracteres."; return; 
+      }
+
+      try {
+        // 1) Verificar username único
+        const unameRef = doc(db, "usernames", username);
+        const unameSnap = await getDoc(unameRef);
+        if (unameSnap.exists()) { msg.textContent = "Ese nombre de usuario ya está en uso."; return; }
+
+        // 2) Email final (placeholder si no da email real)
+        const finalEmail = email || `${username}+noemail@placeholder.local`;
+
+        // 3) Crear credencial
+        const cred = await createUserWithEmailAndPassword(auth, finalEmail, pass);
+
+        // 4) Guardar perfil y mapa de username
+        await Promise.all([
+          setDoc(doc(db, "users", cred.user.uid), {
+            username, email: email || null, createdAt: serverTimestamp()
+          }),
+          setDoc(unameRef, { uid: cred.user.uid }),
+          updateProfile(cred.user, { displayName: username })
+        ]);
+
+        msg.textContent = "Cuenta creada. Ahora inicia sesión.";
+        setTimeout(()=> location.href = "login.html", 800);
+      } catch (err) {
+        msg.textContent = err.message;
+      }
+    });
+  </script>
 </body>
 </html>
+'@

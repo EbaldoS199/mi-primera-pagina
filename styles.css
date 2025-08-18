@@ -67,3 +67,44 @@ body {
     font-weight: bold;
     margin: 0 10px;
 }
+
+/* ====== Base moderna ====== */
+:root{
+  --bg:#0f172a; --card:#111827; --text:#e5e7eb; --muted:#94a3b8; --accent:#22d3ee;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,Segoe UI,Roboto,Inter,Arial}
+.container{max-width:1000px;margin:auto;padding:16px}
+
+/* ====== Barra superior ====== */
+.nav{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
+.nav a{color:var(--text);opacity:.9;text-decoration:none}
+.nav h1{font-size:1.25rem;margin:0}
+
+/* ====== Tarjetas / Inputs / Botones ====== */
+.card{background:var(--card);padding:24px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+label{display:block;margin:10px 0}
+input,button{font:inherit}
+input{width:100%;padding:10px;border-radius:10px;border:1px solid #334155;background:#0b1220;color:var(--text)}
+.btn{display:inline-block;padding:10px 16px;border-radius:12px;background:var(--accent);color:#063;font-weight:700;border:none;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+
+/* ====== Presentación ====== */
+.profile{display:grid;grid-template-columns:120px 1fr;gap:16px;align-items:start}
+.avatar{width:120px;height:120px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.lead{font-size:1.05rem;opacity:.95}
+.cta{margin-top:16px}
+
+/* ====== Interacción ====== */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.row{display:flex;gap:12px;align-items:center;margin-top:8px}
+.chatbox{height:220px;overflow:auto;background:#0b1220;border-radius:10px;padding:8px;border:1px solid #334155}
+.msg{padding:4px 0;border-bottom:1px dotted #334155}
+canvas{outline:none;border-radius:12px;border:1px solid #334155}
+
+/* ====== Responsive ====== */
+@media (max-width:800px){
+  .grid2{grid-template-columns:1fr}
+  .profile{grid-template-columns:1fr}
+}

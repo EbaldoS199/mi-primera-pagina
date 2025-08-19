@@ -1,66 +1,66 @@
-Set-Content -Path login.html -Encoding UTF8 -Value @'
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Iniciar sesión</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Iniciar sesión · Mundo Web Sierra</title>
+  <link rel="stylesheet" href="styles.css"/>
 </head>
-<body class="container">
-  <header class="nav"><a href="index.html">← Inicio</a><h1>Login</h1></header>
+<body class="container hero-bg">
+  <header class="nav">
+    <a href="index.html">← Inicio</a>
+    <h1>Acceso</h1>
+  </header>
 
-  <main class="card">
+  <main class="card glass auth-card">
+    <h2 class="hero-title">Bienvenidos al Mundo Web Sierra</h2>
+    <p class="hero-sub">Accede con tu <strong>usuario</strong> o <strong>email</strong> y contraseña.</p>
+
     <form id="loginForm" autocomplete="off">
       <label>Usuario o Email
-        <input type="text" id="userOrEmail" required placeholder="tu usuario o correo" />
+        <input id="identifier" type="text" placeholder="tu_usuario o tu@email.com" required/>
       </label>
       <label>Contraseña
-        <input type="password" id="password" required />
+        <input id="password" type="password" minlength="6" required/>
       </label>
       <button class="btn" type="submit">Entrar</button>
-      <p>¿No tienes cuenta? <a href="registro.html">Regístrate</a></p>
       <p id="msg"></p>
     </form>
+
+    <p style="margin-top:10px">¿No tienes cuenta? <a href="registro.html">Crear una cuenta</a></p>
   </main>
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
-    import { signInWithEmailAndPassword, onAuthStateChanged } 
-      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { doc, getDoc } 
-      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const form = document.getElementById("loginForm");
-    const msg  = document.getElementById("msg");
+    const msg = document.getElementById("msg");
 
-    form.addEventListener("submit", async (e) => {
+    async function usernameToEmail(username){
+      const uname = username.toLowerCase().trim();
+      const mapSnap = await getDoc(doc(db, "usernames", uname));
+      if (!mapSnap.exists()) throw new Error("Usuario no encontrado.");
+      const uid = mapSnap.data().uid;
+      const userSnap = await getDoc(doc(db, "users", uid));
+      const email = userSnap.data()?.email || (uname + "+noemail@placeholder.local");
+      return email;
+    }
+
+    form.addEventListener("submit", async (e)=>{
       e.preventDefault();
-      const id    = document.getElementById("userOrEmail").value.trim();
-      const pass  = document.getElementById("password").value.trim();
-
+      msg.textContent = "Procesando…";
+      const id = document.getElementById("identifier").value.trim();
+      const pass = document.getElementById("password").value.trim();
       try {
-        let email = id;
-        if (!id.includes("@")) {
-          // username -> uid -> email (si existe) o placeholder
-          const unameSnap = await getDoc(doc(db, "usernames", id.toLowerCase()));
-          if (!unameSnap.exists()) throw new Error("Usuario no encontrado.");
-          const uid = unameSnap.data().uid;
-          const userDoc = await getDoc(doc(db, "users", uid));
-          const storedEmail = userDoc.exists() ? userDoc.data().email : null;
-          email = storedEmail || `${id.toLowerCase()}+noemail@placeholder.local`;
-        }
+        const email = id.includes("@") ? id : await usernameToEmail(id);
         await signInWithEmailAndPassword(auth, email, pass);
         location.href = "presentacion.html";
       } catch (err) {
-        msg.textContent = err.message;
+        msg.textContent = err.message || "No se pudo iniciar sesión.";
       }
-    });
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) location.href = "presentacion.html";
     });
   </script>
 </body>
 </html>
-'@

@@ -108,3 +108,31 @@ canvas{outline:none;border-radius:12px;border:1px solid #334155}
   .grid2{grid-template-columns:1fr}
   .profile{grid-template-columns:1fr}
 }
+
+/* ==== Fondo con marca de agua (usa tu foto) ==== */
+body.hero-bg::before{
+  content:"";
+  position:fixed; inset:0;
+  background:
+    radial-gradient(1200px 600px at 20% -10%, rgba(34,211,238,.12), transparent 40%),
+    radial-gradient(1000px 500px at 120% 10%, rgba(168,85,247,.10), transparent 40%),
+    url("foto_perfil.jpg") center/cover no-repeat fixed;
+  opacity:.18; filter:grayscale(100%) blur(1.5px);
+  z-index:-1;
+}
+
+/* ==== Tarjeta de vidrio (glassmorphism) ==== */
+.glass{
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 20px 60px rgba(0,0,0,.35);
+  border-radius: 18px;
+}
+
+/* Centrado para Auth/Welcome */
+.auth-card{ max-width: 480px; margin: 8vh auto; padding: 28px }
+.hero-card{ max-width: 900px; margin: 8vh auto; padding: 28px }
+.hero-title{ font-size: clamp(1.6rem, 2.6vw, 2.2rem); margin:0 0 6px }
+.hero-sub{ color: var(--muted); margin:0 0 18px }

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -54,10 +54,10 @@
     </style>
 </head>
 <body>
-    <h1>Bienvenido a Industrias Sierra</h1>
+    <h1>Bienvenidos al Mundo Web Sierra</h1>
     <p>Tu sitio web personal de desarrollo web y videojuegos</p>
     <div id="buttons">
-        <a href="login.html"><button class="btn btn-login">Iniciar Sesión</button></a>
+        <a href="login.html"><button class="btn btn-login">Iniciar SesiÃ³n</button></a>
         <a href="registro.html"><button class="btn btn-register">Registrarse</button></a>
     </div>
 
@@ -70,11 +70,14 @@
         // Verificar si hay un usuario logueado en Firebase
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
-                // Si ya hay usuario logueado, redirige a presentación
+                // Si ya hay usuario logueado, redirige a presentaciÃ³n
                 window.location.href = "presentacion.html";
             }
         });
     </script>
 </body>
 </html>
+
+
+
 

@@ -1,49 +1,49 @@
-Set-Content -Path presentacion.html -Encoding UTF8 -Value @'
+﻿Set-Content -Path presentacion.html -Encoding UTF8 -Value @'
 <!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Ebaldo Sierra Sierra · Presentación</title>
+  <title>Ebaldo Sierra Sierra Â· PresentaciÃ³n</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="container">
   <header class="nav">
     <h1>Ebaldo Sierra Sierra</h1>
     <nav>
-      <button class="btn" id="logoutBtn" title="Cerrar sesión">Salir</button>
+      <button class="btn" id="logoutBtn" title="Cerrar sesiÃ³n">Salir</button>
     </nav>
   </header>
 
   <main class="card profile">
     <img src="foto_perfil.jpg" alt="Foto de perfil de Ebaldo" class="avatar" />
     <div>
-      <h2>Desarrollador Web Junior — Proyecto Demo en Vivo</h2>
+      <h2>Desarrollador Web Junior â€” Proyecto Demo en Vivo</h2>
       <p class="lead">
-        Este proyecto demuestra un flujo completo de autenticación con <strong>nombre de usuario</strong> (Firebase Auth),
-        almacenamiento de datos en <strong>Cloud Firestore</strong>, y se ampliará con <strong>juegos</strong> y un
+        Este proyecto demuestra un flujo completo de autenticaciÃ³n con <strong>nombre de usuario</strong> (Firebase Auth),
+        almacenamiento de datos en <strong>Cloud Firestore</strong>, y se ampliarÃ¡ con <strong>juegos</strong> y un
         <strong>mini-chat</strong> en tiempo real. Trabajo con <strong>HTML, CSS y JavaScript</strong>, despliegue en
         <strong>GitHub Pages</strong> y servicios administrados con <strong>Firebase</strong>.
       </p>
 
       <section>
-        <h3>Qué puedo hacer</h3>
+        <h3>QuÃ© puedo hacer</h3>
         <ul>
-          <li>Diseñar interfaces responsive modernas con HTML/CSS.</li>
-          <li>Programar en JavaScript (DOM, módulos ES, eventos, canvas).</li>
-          <li>Configurar autenticación y reglas de seguridad en Firebase.</li>
+          <li>DiseÃ±ar interfaces responsive modernas con HTML/CSS.</li>
+          <li>Programar en JavaScript (DOM, mÃ³dulos ES, eventos, canvas).</li>
+          <li>Configurar autenticaciÃ³n y reglas de seguridad en Firebase.</li>
           <li>Guardar y consultar datos con Firestore (en tiempo real).</li>
           <li>Desplegar proyectos en GitHub Pages de forma continua.</li>
         </ul>
       </section>
 
       <section>
-        <h3>Qué estoy estudiando y qué estudiaré</h3>
+        <h3>QuÃ© estoy estudiando y quÃ© estudiarÃ©</h3>
         <p>
-          Refuerzo fundamentos de <strong>JavaScript</strong>, prácticas de <strong>accesibilidad</strong>, patrones de
-          <strong>componentización</strong> y conceptos de <strong>bases de datos</strong>. Próximamente me enfocaré en
-          <strong>TypeScript</strong>, <strong>React</strong> y <strong>Buenas Prácticas de Seguridad Web</strong>.
-          También mejoro mi <strong>inglés técnico</strong> a diario.
+          Refuerzo fundamentos de <strong>JavaScript</strong>, prÃ¡cticas de <strong>accesibilidad</strong>, patrones de
+          <strong>componentizaciÃ³n</strong> y conceptos de <strong>bases de datos</strong>. PrÃ³ximamente me enfocarÃ© en
+          <strong>TypeScript</strong>, <strong>React</strong> y <strong>Buenas PrÃ¡cticas de Seguridad Web</strong>.
+          TambiÃ©n mejoro mi <strong>inglÃ©s tÃ©cnico</strong> a diario.
         </p>
       </section>
 
@@ -53,39 +53,41 @@ Set-Content -Path presentacion.html -Encoding UTF8 -Value @'
       </section>
 
       <div class="cta">
-        <a class="btn" href="interaccion.html" title="Juegos & Mini-chat">Interacción (Juegos & Mini-chat)</a>
+        <a class="btn" href="interaccion.html" title="Juegos & Mini-chat">InteracciÃ³n (Juegos & Mini-chat)</a>
       </div>
     </div>
   </main>
 
-  <footer>© 2025 Ebaldo Sierra Sierra · Demo educativo</footer>
+  <footer>Â© 2025 Ebaldo Sierra Sierra Â· Demo educativo</footer>
 
   <script type="module">
     import { auth } from "./firebase-config.js";
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    // Guard: si no hay sesión, vuelve a login
+    // Guard: si no hay sesiÃ³n, vuelve a login
     onAuthStateChanged(auth, (user) => { if (!user) location.href = "login.html"; });
 
     // Logout
     document.getElementById("logoutBtn").onclick = () => signOut(auth).then(()=>location.href="index.html");
 
-    // Mini-glosario (palabra · pronunciación · ejemplo)
+    // Mini-glosario (palabra Â· pronunciaciÃ³n Â· ejemplo)
     const terms = [
-      {es:"Proyecto", en:"Project", pron:"pró-yect", ex:"Create a new project on GitHub."},
-      {es:"Repositorio", en:"Repository", pron:"ripósitori", ex:"Push code to the repository."},
+      {es:"Proyecto", en:"Project", pron:"prÃ³-yect", ex:"Create a new project on GitHub."},
+      {es:"Repositorio", en:"Repository", pron:"ripÃ³sitori", ex:"Push code to the repository."},
       {es:"Rama", en:"Branch", pron:"branch", ex:"Work on a new feature branch."},
-      {es:"Desplegar", en:"Deploy", pron:"diplói", ex:"Deploy the site to GitHub Pages."},
-      {es:"Autenticación", en:"Authentication", pron:"ó-ten-ti-kéi-shon", ex:"Email/Password authentication is enabled."},
-      {es:"Reglas", en:"Rules", pron:"rúuls", ex:"Publish Firestore security rules."}
+      {es:"Desplegar", en:"Deploy", pron:"diplÃ³i", ex:"Deploy the site to GitHub Pages."},
+      {es:"AutenticaciÃ³n", en:"Authentication", pron:"Ã³-ten-ti-kÃ©i-shon", ex:"Email/Password authentication is enabled."},
+      {es:"Reglas", en:"Rules", pron:"rÃºuls", ex:"Publish Firestore security rules."}
     ];
     const ul = document.getElementById("gloss");
     terms.forEach(t=>{
       const li=document.createElement("li");
-      li.textContent = `${t.es} → ${t.en} [${t.pron}] · ${t.ex}`;
+      li.textContent = `${t.es} â†’ ${t.en} [${t.pron}] Â· ${t.ex}`;
       ul.appendChild(li);
     });
   </script>
 </body>
 </html>
 '@
+
+

@@ -14,11 +14,11 @@
   </header>
 
   <main class="grid2">
-    <!-- Juego (Flappy-like) -->
-    <section class="card">
+    <!-- Juego 1: Tap-Bird -->
+    <section class="card glass">
       <h2>Juego: Tap-Bird</h2>
       <p class="lead">Toca / clic / barra espaciadora para volar. Pasa por los huecos para sumar puntos.</p>
-      <canvas id="game" width="420" height="560"></canvas>
+      <canvas id="game" width="420" height="560" tabindex="0"></canvas>
       <div class="row">
         <button class="btn" id="restartBtn">Reiniciar</button>
         <span id="scoreText">Puntaje: 0</span>
@@ -27,12 +27,15 @@
       <p id="gameMsg" class="row" style="margin-top:6px;"></p>
     </section>
 
-    <!-- Ranking + Mini-chat -->
-    <section class="card">
+    <!-- Comunidad: Rankings y Chat -->
+    <section class="card glass">
       <h2>Comunidad</h2>
 
-      <h3>🏆 Ranking top 5</h3>
-      <ol id="ranking"></ol>
+      <h3>🏆 Ranking Tap-Bird</h3>
+      <ol id="rankingBird" class="ranking"></ol>
+
+      <h3 style="margin-top:12px;">🏆 Ranking Runner</h3>
+      <ol id="rankingRunner" class="ranking"></ol>
 
       <h3 style="margin-top:18px;">💬 Mini-chat</h3>
       <div class="chatbox" id="chatBox"></div>
@@ -40,7 +43,20 @@
         <input id="chatInput" type="text" placeholder="Escribe un mensaje (Enter para enviar)"/>
         <button class="btn" type="submit">Enviar</button>
       </form>
-      <small style="color:#94a3b8;">Se muestran solo los últimos 30 mensajes.</small>
+      <small style="color:#94a3b8;">Se muestran solo los úúltimos 30 mensajes.</small>
+    </section>
+
+    <!-- Juego 2: Runner (salta obstáculos) -->
+    <section class="card glass" style="grid-column:1/-1">
+      <h2>Juego: Runner</h2>
+      <p class="lead">Barra espaciadora para saltar. Evita obstáculos para sumar puntos.</p>
+      <canvas id="runner" width="900" height="220" tabindex="0" style="width:100%"></canvas>
+      <div class="row">
+        <button class="btn" id="runRestart">Reiniciar Runner</button>
+        <span id="runScore">Puntaje: 0</span>
+        <span id="runLevel" style="margin-left:auto">Velocidad: 1.0x</span>
+      </div>
+      <p id="runMsg" class="row" style="margin-top:6px;"></p>
     </section>
   </main>
 
@@ -49,20 +65,17 @@
   <script type="module">
     import { auth, db } from "./firebase-config.js";
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { 
-      collection, addDoc, serverTimestamp, query, orderBy, limit, onSnapshot 
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { collection, addDoc, serverTimestamp, query, orderBy, limit, onSnapshot, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     // ======== Auth guard y logout ========
     let currentUser = null;
     onAuthStateChanged(auth, (user) => {
       if (!user) { location.href = "login.html"; return; }
-      currentUser = user;
-      // usamos displayName como username (definido al registrarse)
+      currentUser = user; 
     });
-    document.getElementById("logoutBtn").onclick = () => signOut(auth).then(()=>location.href="index.html");
+    document.getElementById("logoutBtn").onclick = () => signOut(auth).then(()=>location.href = "index.html");
 
-    // ======== Juego Tap-Bird (Flappy-like) ========
+    // ======== Juego 1: Tap-Bird ========
     const cvs = document.getElementById("game");
     const ctx = cvs.getContext("2d");
     const scoreText = document.getElementById("scoreText");
@@ -77,84 +90,48 @@
       pipes = []; score = 0; level = 1;
       gravity = 0.45; jumpForce = -7.5; speed = 2.2; gap = 130; running = true;
       gameMsg.textContent = "";
-      spawnPipe();
-      spawnPipe();
-      loop();
-      updateHUD();
+      spawnPipe(); spawnPipe();
+      loop(); updateHUD();
     }
-
-    function updateHUD(){
-      scoreText.textContent = "Puntaje: " + score;
-      levelText.textContent = "Nivel: " + level;
-    }
-
-    function colorByLevel(lv){
-      if (lv>=5) return "#a78bfa";
-      if (lv>=4) return "#22d3ee";
-      if (lv>=3) return "#34d399";
-      if (lv>=2) return "#f59e0b";
-      return "#60a5fa";
-    }
-
+    function updateHUD(){ scoreText.textContent = "Puntaje: " + score; levelText.textContent = "Nivel: " + level; }
+    function colorByLevel(lv){ if (lv>=5) return "#a78bfa"; if (lv>=4) return "#22d3ee"; if (lv>=3) return "#34d399"; if (lv>=2) return "#f59e0b"; return "#60a5fa"; }
     function spawnPipe(){
       const last = pipes[pipes.length-1];
       const minTop = 60, maxTop = cvs.height - 200;
       const top = Math.max(minTop, Math.min(maxTop, (last? last.top : 220) + (Math.random()*120-60)));
-      pipes.push({
-        x: cvs.width + (last? last.x + 200 : 0),
-        top, gap,
-        passed:false
-      });
+      pipes.push({ x: cvs.width + (last? last.x + 200 : 0), top, gap, passed:false });
     }
-
     function jump(){ bird.vy = jumpForce; }
-
     function collide(px, py, pr, rx, ry, rw, rh){
       const cx = Math.max(rx, Math.min(px, rx+rw));
       const cy = Math.max(ry, Math.min(py, ry+rh));
       const dx = px - cx, dy = py - cy;
       return dx*dx + dy*dy < pr*pr;
     }
-
     function loop(){
       if (!running) return;
       requestAnimationFrame(loop);
+      bird.vy += gravity; bird.y += bird.vy;
 
-      bird.vy += gravity;
-      bird.y += bird.vy;
-
-      ctx.fillStyle = "#0b1220";
-      ctx.fillRect(0,0,cvs.width,cvs.height);
-
+      ctx.fillStyle = "#0b1220"; ctx.fillRect(0,0,cvs.width,cvs.height);
       ctx.fillStyle = colorByLevel(level);
       for (let p of pipes){
         p.x -= speed;
         ctx.fillRect(p.x, 0, 46, p.top);
         const bottomY = p.top + p.gap;
         ctx.fillRect(p.x, bottomY, 46, cvs.height-bottomY);
-
         if (!p.passed && p.x + 46 < bird.x - bird.r){
-          p.passed = true;
-          score++;
-          if (score % 8 === 0){
-            level++;
-            speed += 0.25;
-            if (gap > 100) gap -= 4;
-          }
+          p.passed = true; score++;
+          if (score % 8 === 0){ level++; speed += 0.25; if (gap > 100) gap -= 4; }
           updateHUD();
         }
       }
       if (pipes.length < 5) spawnPipe();
       while (pipes.length && pipes[0].x < -60) pipes.shift();
 
-      ctx.beginPath();
-      ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI*2);
-      ctx.fillStyle = "#eab308";
-      ctx.fill();
-      ctx.closePath();
+      ctx.beginPath(); ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI*2); ctx.fillStyle = "#eab308"; ctx.fill(); ctx.closePath();
 
       if (bird.y - bird.r < 0 || bird.y + bird.r > cvs.height) return gameOver();
-
       for (let p of pipes){
         if (collide(bird.x, bird.y, bird.r, p.x, 0, 46, p.top) ||
             collide(bird.x, bird.y, bird.r, p.x, p.top+p.gap, 46, cvs.height-(p.top+p.gap))){
@@ -162,92 +139,175 @@
         }
       }
     }
-
     function gameOver(){
       running = false;
       gameMsg.textContent = "Game Over · tu puntaje: " + score + " · Guardando…";
-      saveScore(score).then(()=>{
-        gameMsg.textContent = "Puntaje guardado ✅";
-      }).catch((e)=>{
-        gameMsg.textContent = "No se pudo guardar: " + e.message;
-      });
+      saveScore(score, "tapbird").then(()=>{ gameMsg.textContent = "Puntaje guardado ✅"; })
+                                 .catch((e)=>{ gameMsg.textContent = "No se pudo guardar: " + e.message; });
     }
-
-    window.addEventListener("keydown", (e)=>{
-  if (e.code === "Space") {
-    const el = document.activeElement;
-    const typing = el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable);
-    if (typing) return;      // no bloquear espacio cuando se escribe
-    e.preventDefault();
-    jump();                  // Tap-Bird
-    if (typeof runJump === "function") runJump(); // Runner (si lo agregas)
-  }
-});
     cvs.addEventListener("pointerdown", ()=> jump());
-    document.getElementById("restartBtn").onclick = ()=> resetGame();
+    restartBtn.onclick = ()=> resetGame();
 
-    // ======== Firestore: Ranking y Chat ========
-    const rankingEl = document.getElementById("ranking");
-    const chatBox = document.getElementById("chatBox");
+    // ======== Juego 2: Runner ========
+    const rcv = document.getElementById("runner");
+    const rtx = rcv.getContext("2d");
+    const runMsg   = document.getElementById("runMsg");
+    const runScore = document.getElementById("runScore");
+    const runLevel = document.getElementById("runLevel");
+    const runRestart = document.getElementById("runRestart");
+
+    let rPlayer, rObst, rScore, rSpeed, rGravity, rJump, rGround, runningR;
+
+    function resetRunner(){
+      rGround = rcv.height - 60;
+      rPlayer = { x: 80, y: rGround-20, w: 22, h: 22, vy: 0 };
+      rObst = []; rScore = 0; rSpeed = 4; rGravity = 0.8; rJump = -12; runningR = true;
+      runMsg.textContent = ""; spawnObs(); loopRunner(); updateRunHUD();
+    }
+    function updateRunHUD(){
+      runScore.textContent = "Puntaje: " + rScore;
+      runLevel.textContent = "Velocidad: " + (rSpeed/4).toFixed(1) + "x";
+    }
+    function spawnObs(){
+      const gap = 220 + Math.random()*140;
+      const lastX = rObst.length ? rObst[rObst.length-1].x : rcv.width;
+      const h = 18 + Math.random()*34;
+      const w = 16 + Math.random()*18;
+      rObst.push({ x:lastX + gap, y:rGround - h, w, h, passed:false });
+    }
+    function runJump(){
+      const onGround = Math.abs(rPlayer.y - (rGround - rPlayer.h)) < 0.5;
+      if (onGround) rPlayer.vy = rJump;
+    }
+    function collideR(a,b){
+      return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+    }
+    function loopRunner(){
+      if (!runningR) return;
+      requestAnimationFrame(loopRunner);
+
+      rPlayer.vy += rGravity; rPlayer.y += rPlayer.vy;
+      if (rPlayer.y > rGround - rPlayer.h){ rPlayer.y = rGround - rPlayer.h; rPlayer.vy = 0; }
+
+      rtx.fillStyle = "#0b1220"; rtx.fillRect(0,0,rcv.width,rcv.height);
+      rtx.fillStyle = "#1f2937"; rtx.fillRect(0, rGround, rcv.width, 3);
+
+      rtx.fillStyle = "#34d399";
+      for (let o of rObst){
+        o.x -= rSpeed;
+        rtx.fillRect(o.x, o.y, o.w, o.h);
+        if (!o.passed && o.x + o.w < rPlayer.x){
+          o.passed = true; rScore++;
+          if (rScore % 7 === 0){ rSpeed += 0.4; }
+          updateRunHUD();
+        }
+        if (collideR({x:rPlayer.x,y:rPlayer.y,w:rPlayer.w,h:rPlayer.h}, o)){
+          return gameOverR();
+        }
+      }
+      if (rObst.length < 4) spawnObs();
+      while (rObst.length && rObst[0].x < -40) rObst.shift();
+
+      rtx.fillStyle = "#f59e0b";
+      rtx.fillRect(rPlayer.x, rPlayer.y, rPlayer.w, rPlayer.h);
+    }
+    function gameOverR(){
+      runningR = false;
+      runMsg.textContent = "Game Over · tu puntaje: " + rScore + " · Guardando…";
+      saveScore(rScore, "runner").then(()=>{ runMsg.textContent = "Puntaje guardado ✅"; })
+                                 .catch((e)=>{ runMsg.textContent = "No se pudo guardar: " + e.message; });
+    }
+    rcv.addEventListener("pointerdown", ()=> runJump());
+    runRestart.onclick = ()=> resetRunner();
+
+    // ======== Ranking y Chat ========
+    const rankingBirdEl   = document.getElementById("rankingBird");
+    const rankingRunnerEl = document.getElementById("rankingRunner");
+    const chatBox  = document.getElementById("chatBox");
     const chatForm = document.getElementById("chatForm");
-    const chatInput = document.getElementById("chatInput");
+    const chatInput= document.getElementById("chatInput");
 
-    async function saveScore(score){
+    async function saveScore(score, game){
       if (!currentUser) return;
       const username = currentUser.displayName || "user";
       await addDoc(collection(db, "scores"), {
-        uid: currentUser.uid,
-        username,
-        score,
-        createdAt: serverTimestamp()
+        uid: currentUser.uid, username, score, game, createdAt: serverTimestamp()
       });
     }
 
+    // Ranking Tap-Bird (top 5)
     onSnapshot(
-      query(collection(db, "scores"), orderBy("score", "desc"), limit(5)),
+      query(collection(db, "scores"), where("game","==","tapbird"), orderBy("score","desc"), limit(5)),
       (snap)=>{
-        rankingEl.innerHTML = "";
+        rankingBirdEl.innerHTML = "";
         let i = 0;
         snap.forEach(doc=>{
           const d = doc.data(); i++;
           const li = document.createElement("li");
-          let medal = i===1?"🥇": i===2?"🥈": i===3?"🥉":"";
+          const medal = i===1?"👑🥇": i===2?"👑🥈": i===3?"👑🥉":"";
+          li.className = "rank-" + i;
           li.innerHTML = `<strong>${i}. ${d.username}</strong> — ${d.score} ${medal}`;
-          rankingEl.appendChild(li);
+          rankingBirdEl.appendChild(li);
         });
       }
     );
 
+    // Ranking Runner (top 5)
+    onSnapshot(
+      query(collection(db, "scores"), where("game","==","runner"), orderBy("score","desc"), limit(5)),
+      (snap)=>{
+        rankingRunnerEl.innerHTML = "";
+        let i = 0;
+        snap.forEach(doc=>{
+          const d = doc.data(); i++;
+          const li = document.createElement("li");
+          const medal = i===1?"👑🥇": i===2?"👑🥈": i===3?"👑🥉":"";
+          li.className = "rank-" + i;
+          li.innerHTML = `<strong>${i}. ${d.username}</strong> — ${d.score} ${medal}`;
+          rankingRunnerEl.appendChild(li);
+        });
+      }
+    );
+
+    // Mini-chat
     chatForm.addEventListener("submit", async (e)=>{
       e.preventDefault();
       const text = chatInput.value.trim().slice(0, 280);
       if (!text || !currentUser) return;
       const username = currentUser.displayName || "user";
-      await addDoc(collection(db, "messages"), {
-        uid: currentUser.uid, username, text, createdAt: serverTimestamp()
-      });
+      await addDoc(collection(db, "messages"), { uid: currentUser.uid, username, text, createdAt: serverTimestamp() });
       chatInput.value = "";
     });
 
-    onSnapshot(
-      query(collection(db, "messages"), orderBy("createdAt", "desc"), limit(30)),
-      (snap)=>{
-        chatBox.innerHTML = "";
-        snap.forEach(doc=>{
-          const m = doc.data();
-          const div = document.createElement("div");
-          div.className = "msg";
-          const when = m.createdAt?.toDate?.() ? new Date(m.createdAt.toDate()).toLocaleTimeString() : "";
-          div.textContent = `[${when}] ${m.username}: ${m.text}`;
-          chatBox.appendChild(div);
-        });
-        chatBox.scrollTop = 0;
-      }
-    );
+    onSnapshot(query(collection(db, "messages"), orderBy("createdAt","desc"), limit(30)), (snap)=>{
+      chatBox.innerHTML = "";
+      snap.forEach(doc=>{
+        const m = doc.data();
+        const div = document.createElement("div");
+        div.className = "msg";
+        const when = m.createdAt?.toDate?.() ? new Date(m.createdAt.toDate()).toLocaleTimeString() : "";
+        div.textContent = `[${when}] ${m.username}: ${m.text}`;
+        chatBox.appendChild(div);
+      });
+      chatBox.scrollTop = 0;
+    });
 
+    // ======== Tecla Espacio (no bloquear el chat) ========
+    window.addEventListener("keydown", (e)=>{
+      if (e.code === "Space") {
+        const el = document.activeElement;
+        const typing = el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable);
+        if (typing) return;
+        e.preventDefault();
+        if (typeof jump==="function") jump();
+        if (typeof runJump==="function") runJump();
+      }
+    });
+
+    // Iniciar juegos
     resetGame();
+    resetRunner();
   </script>
 </body>
 </html>
-
 

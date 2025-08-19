@@ -1,4 +1,4 @@
-Set-Content -Path registro.html -Encoding UTF8 -Value @'
+﻿Set-Content -Path registro.html -Encoding UTF8 -Value @'
 <!doctype html>
 <html lang="es">
 <head>
@@ -8,20 +8,20 @@ Set-Content -Path registro.html -Encoding UTF8 -Value @'
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="container">
-  <header class="nav"><a href="login.html">← Iniciar sesión</a><h1>Crear cuenta</h1></header>
+  <header class="nav"><a href="login.html">â† Iniciar sesiÃ³n</a><h1>Crear cuenta</h1></header>
 
   <main class="card">
     <form id="registerForm" autocomplete="off">
-      <label>Nombre de usuario (único)
+      <label>Nombre de usuario (Ãºnico)
         <input type="text" id="username" minlength="3" required placeholder="ej: evaldo_dev" />
       </label>
       <label>Email (opcional pero recomendado)
         <input type="email" id="email" placeholder="ej: tu@correo.com" />
       </label>
-      <label>Contraseña
+      <label>ContraseÃ±a
         <input type="password" id="password" minlength="6" required />
       </label>
-      <label>Confirmar contraseña
+      <label>Confirmar contraseÃ±a
         <input type="password" id="confirm" minlength="6" required />
       </label>
 
@@ -47,16 +47,16 @@ Set-Content -Path registro.html -Encoding UTF8 -Value @'
       const pass     = document.getElementById("password").value.trim();
       const confirm  = document.getElementById("confirm").value.trim();
 
-      if (pass !== confirm) { msg.textContent = "Las contraseñas no coinciden."; return; }
+      if (pass !== confirm) { msg.textContent = "Las contraseÃ±as no coinciden."; return; }
       if (!/^[a-z0-9_\.]{3,20}$/.test(username)) { 
-        msg.textContent = "El usuario solo letras/números/._ y 3-20 caracteres."; return; 
+        msg.textContent = "El usuario solo letras/nÃºmeros/._ y 3-20 caracteres."; return; 
       }
 
       try {
-        // 1) Verificar username único
+        // 1) Verificar username Ãºnico
         const unameRef = doc(db, "usernames", username);
         const unameSnap = await getDoc(unameRef);
-        if (unameSnap.exists()) { msg.textContent = "Ese nombre de usuario ya está en uso."; return; }
+        if (unameSnap.exists()) { msg.textContent = "Ese nombre de usuario ya estÃ¡ en uso."; return; }
 
         // 2) Email final (placeholder si no da email real)
         const finalEmail = email || `${username}+noemail@placeholder.local`;
@@ -73,7 +73,7 @@ Set-Content -Path registro.html -Encoding UTF8 -Value @'
           updateProfile(cred.user, { displayName: username })
         ]);
 
-        msg.textContent = "Cuenta creada. Ahora inicia sesión.";
+        msg.textContent = "Cuenta creada. Ahora inicia sesiÃ³n.";
         setTimeout(()=> location.href = "login.html", 800);
       } catch (err) {
         msg.textContent = err.message;
@@ -83,3 +83,5 @@ Set-Content -Path registro.html -Encoding UTF8 -Value @'
 </body>
 </html>
 '@
+
+

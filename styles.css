@@ -136,3 +136,10 @@ body.hero-bg::before{
 .hero-card{ max-width: 900px; margin: 8vh auto; padding: 28px }
 .hero-title{ font-size: clamp(1.6rem, 2.6vw, 2.2rem); margin:0 0 6px }
 .hero-sub{ color: var(--muted); margin:0 0 18px }
+
+/* Ranking destacado (top 3) */
+.ranking{ padding-left: 18px }
+.ranking li{ padding:4px 6px; border-radius:10px; margin:4px 0 }
+.ranking .rank-1{ background:#1f2937; border:1px solid #fbbf24; color:#fde68a }
+.ranking .rank-2{ background:#111827; border:1px solid #9ca3af; color:#e5e7eb }
+.ranking .rank-3{ background:#0f172a; border:1px solid #b45309; color:#fed7aa }

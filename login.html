@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>iniciar sesión · Mundo Web Sierra</title>
+  <title>Iniciar sesión · Mundo Web Sierra</title>
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body class="container hero-bg">
@@ -20,7 +20,7 @@
       <label>Usuario o Email
         <input id="identifier" type="text" placeholder="tu_usuario o tu@email.com" required/>
       </label>
-      <label>Contraseña
+      <label>contraseña
         <input id="password" type="password" minlength="6" required/>
       </label>
       <button class="btn" type="submit">Iniciar sesión</button>
@@ -58,12 +58,16 @@
         await signInWithEmailAndPassword(auth, email, pass);
         location.href = "presentacion.html";
       } catch (err) {
-        msg.textContent = err.message || "No se pudo iniciar sesión.";
+        msg.textContent = err.message || "No se pudo Iniciar sesión.";
       }
     });
   </script>
 </body>
 </html>
+
+
+
+
 
 
 

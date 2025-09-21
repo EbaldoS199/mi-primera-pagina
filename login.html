@@ -118,7 +118,7 @@
     /* ====== Móvil: secuencia HELLO → WELCOME → LOGO en área 04 ====== */
     @media (max-width:980px){
       .welcome-left{ display:none } /* en móvil NO va el WELCOME grande */
-      .login-card{ margin:14% 6% 0; width:min(92vw,520px) }
+      .login-card{ margin: 10vh auto 0; width:min(92vw,520px) }
       .brand-04{ position:relative; height:120px; margin-bottom: 3.5vh }
       .seq-img{
         position:absolute; inset:0; display:block; object-fit:contain; margin:auto;
@@ -209,7 +209,15 @@
 @media (min-width:981px){
   .marquee{ pointer-events: none !important; }
 }
+/* === overrides v=16 (móvil: card centrada + optimizaciones) === */
+@media (max-width:980px){
+  .marquee{ pointer-events: none !important; }
+}
 </style>
+  <link rel="preload" as="image" href="./assets/img/login/bg-cartagena-desktop.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="./assets/img/login/welcome-neon.png" media="(max-width:980px)">
+  <link rel="preload" as="image" href="./assets/img/login/hello-neon.png" media="(max-width:980px)">
+  <link rel="preload" as="image" href="./assets/img/brand/sierra-logo.png" media="(max-width:980px)">
 </head>
 <body class="login-hero">
   <!-- Capa de chispas -->
@@ -231,9 +239,9 @@
       <img id="logoStatic" src="./assets/img/brand/sierra-logo.png" alt="Sierra Developer">
 
       <!-- En móvil: secuencia HELLO → WELCOME → LOGO -->
-      <img class="seq-img" id="seqHello"   src="./assets/img/login/hello-neon.png"   alt="HELLO">
-      <img class="seq-img" id="seqWelcome" src="./assets/img/login/welcome-neon.png" alt="WELCOME">
-      <img class="seq-img" id="seqLogo"    src="./assets/img/brand/sierra-logo.png"  alt="Sierra Developer">
+      <img class="seq-img" id="seqHello"   src="./assets/img/login/hello-neon.png"   alt="HELLO" loading="lazy" decoding="async">
+      <img class="seq-img" id="seqWelcome" src="./assets/img/login/welcome-neon.png" alt="WELCOME" loading="eager" decoding="async" fetchpriority="high">
+      <img class="seq-img" id="seqLogo"    src="./assets/img/brand/sierra-logo.png"  alt="Sierra Developer" loading="eager" decoding="async" fetchpriority="high">
     </div>
 
     <!-- Campo NAME/Email -->
@@ -378,6 +386,7 @@
   </script>
 </body>
 </html>
+
 
 
 

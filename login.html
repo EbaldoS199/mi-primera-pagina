@@ -9,157 +9,136 @@
   <link rel="stylesheet" href="./styles.css" />
   <style>
     /* ====== Login page specific (pequeño refuerzo) ====== */
-    .login-hero {
-      position: relative;
-      min-height: 100dvh;
-      background: #0b1220 url("./assets/img/login/bg-cartagena-desktop.jpg") center/cover no-repeat;
-      overflow: hidden;
-      isolation: isolate;
+    .login-hero{
+      position:relative;
+      min-height:100dvh;
+      background:#0b1220 url("./assets/img/login/bg-cartagena-desktop.jpg") center/cover no-repeat;
+      overflow:hidden;
+      isolation:isolate;
     }
-    .login-overlay { /* oscurecedor para contraste */
+    .login-overlay{ /* oscurecedor para contraste */
       position:absolute; inset:0;
-      background: linear-gradient(0deg, rgba(6,18,31,.60), rgba(6,18,31,.36));
+      background:linear-gradient(0deg, rgba(6,18,31,.60), rgba(6,18,31,.36));
       pointer-events:none;
+      z-index:0; /* asegura que quede detrás del WELCOME y la card */
     }
+
     /* “WELCOME” grande fuera del panel (PC) */
-    .welcome-left {
-      position: absolute;
-      left: 6%;
-      bottom: 18%;
-      width: min(44vw, 900px);
-      height: auto;
-      filter: drop-shadow(0 0 10px #2fd3ff) drop-shadow(0 0 30px #2fd3ff);
-      animation: glowPulse 2.8s ease-in-out infinite;
-      user-select: none;
+    .welcome-left{
+      position:absolute;
+      left:6%;
+      top:clamp(12px,4vh,28px);   /* arriba casi pegado */
+      bottom:auto;                /* sin bottom */
+      width:min(44vw, 900px);
+      height:auto;
+      filter:drop-shadow(0 0 10px #2fd3ff) drop-shadow(0 0 30px #2fd3ff);
+      animation:glowPulse 2.8s ease-in-out infinite;
+      user-select:none;
+      z-index:1; /* sobre el fondo, debajo de la card */
     }
-    @keyframes glowPulse {
-      0%,100% { filter: drop-shadow(0 0 10px #2fd3ff) drop-shadow(0 0 30px #2fd3ff); }
-      50%     { filter: drop-shadow(0 0 16px #5ce6ff) drop-shadow(0 0 40px #5ce6ff); }
+    @keyframes glowPulse{
+      0%,100%{ filter:drop-shadow(0 0 10px #2fd3ff) drop-shadow(0 0 30px #2fd3ff) }
+      50%    { filter:drop-shadow(0 0 16px #5ce6ff) drop-shadow(0 0 40px #5ce6ff) }
     }
+
     /* Panel (card) a la derecha */
-    .login-card {
-      position: relative;
-      margin: 10% 7% 0 auto; /* top right bottom left */
-      width: clamp(320px, 28vw, 460px);
-      background: rgba(8,22,40,.52);
-      backdrop-filter: blur(14px) saturate(120%);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
-      color: #e6f1ff;
-      padding: 24px;
-      display: grid;
-      gap: 14px;
-      z-index: 2;
-      animation: cardIn 280ms ease-out both;
+    .login-card{
+      position:relative;
+      margin:6% 7% 0 auto; /* ⬅ subimos el glass (antes 10%) */
+      width:clamp(320px, 28vw, 460px);
+      background:rgba(8,22,40,.52);
+      backdrop-filter:blur(14px) saturate(120%);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:24px;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+      color:#e6f1ff;
+      padding:24px;
+      display:grid;
+      gap:14px;
+      z-index:2;
+      animation:cardIn 280ms ease-out both;
     }
-    @keyframes cardIn { from { opacity:0; transform: translateY(20px);} to { opacity:1; transform:none;} }
+    @keyframes cardIn{ from{opacity:0; transform:translateY(20px)} to{opacity:1; transform:none} }
 
-    .brand-04 {
-      display: grid;
-      place-items: center;
-      margin-bottom: 18px; /* separación logo→inputs */
-    }
-    .brand-04 img {
-      width: 82px; height: auto; object-fit: contain;
-      filter: drop-shadow(0 0 6px rgba(47,211,255,.6));
-    }
+    .brand-04{ display:grid; place-items:center; margin-bottom:18px }
+    .brand-04 img{ width:82px; height:auto; object-fit:contain; filter:drop-shadow(0 0 6px rgba(47,211,255,.6)) }
 
-    .field { display: grid; gap: 6px; }
-    .field label { font-size: .9rem; color: #c9dbff; }
-    .text-input {
-      width: 100%;
-      background: rgba(12,24,40,.66);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 12px;
-      padding: 12px 14px;
-      color: #e6f1ff;
-      outline: none;
-      transition: box-shadow .15s ease, border-color .15s ease;
-    }
-    .text-input:focus {
-      border-color: #2fd3ff;
-      box-shadow: 0 0 0 2px rgba(47,211,255,.35);
-    }
-    .text-input[aria-invalid="true"] {
-      border-color: #ff8a8a;
-      box-shadow: 0 0 0 2px rgba(255,138,138,.35);
-    }
+    /* Por defecto (PC): ocultar la secuencia para que NO aparezcan 3 imágenes */
+    .seq-img{ display:none }
 
-    .row-between { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-    .link {
-      color: #9bdfff; text-decoration: none; font-weight: 600;
+    .field{ display:grid; gap:6px }
+    .field label{ font-size:.9rem; color:#c9dbff }
+    .text-input{
+      width:100%; background:rgba(12,24,40,.66);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:12px; padding:12px 14px; color:#e6f1ff; outline:none;
+      transition:box-shadow .15s ease, border-color .15s ease;
     }
-    .link:hover, .link:focus { text-decoration: underline; outline: none; }
+    .text-input:focus{ border-color:#2fd3ff; box-shadow:0 0 0 2px rgba(47,211,255,.35) }
+    .text-input[aria-invalid="true"]{ border-color:#ff8a8a; box-shadow:0 0 0 2px rgba(255,138,138,.35) }
 
-    .btn-primary {
-      appearance: none; border: none; cursor: pointer;
-      padding: 12px 16px; width: 100%;
-      border-radius: 12px;
-      color: #041321; font-weight: 800; letter-spacing: .3px;
-      background: linear-gradient(90deg, #2fd3ff, #10b2e6);
-      box-shadow: 0 8px 18px rgba(47,211,255,.25);
-      transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
+    .row-between{ display:flex; align-items:center; justify-content:space-between; gap:8px }
+    .link{ color:#9bdfff; text-decoration:none; font-weight:600 }
+    .link:hover,.link:focus{ text-decoration:underline; outline:none }
+
+    .btn-primary{
+      appearance:none; border:0; cursor:pointer; padding:12px 16px; width:100%;
+      border-radius:12px; color:#041321; font-weight:800; letter-spacing:.3px;
+      background:linear-gradient(90deg, #2fd3ff, #10b2e6);
+      box-shadow:0 8px 18px rgba(47,211,255,.25);
+      transition:transform .06s ease, box-shadow .2s ease, filter .2s ease;
     }
-    .btn-primary:hover { box-shadow: 0 10px 26px rgba(47,211,255,.35);}
-    .btn-primary:active { transform: translateY(1px); }
-    .btn-primary:disabled { opacity:.6; cursor:not-allowed; }
+    .btn-primary:hover{ box-shadow:0 10px 26px rgba(47,211,255,.35) }
+    .btn-primary:active{ transform:translateY(1px) }
+    .btn-primary:disabled{ opacity:.6; cursor:not-allowed }
 
     /* Marquesina (03) */
-    .marquee {
-      position: absolute; bottom: 6vh; left: 0; right: 0;
-      color: #cfe9ff;
-      overflow: hidden; z-index: 2;
-      mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+    .marquee{
+      position:absolute; bottom:6vh; left:0; right:0;
+      color:#cfe9ff; overflow:hidden; z-index:2;
+      mask-image:linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
     }
-    .marquee-track {
-      display: inline-flex; gap: 28px; align-items: center;
-      white-space: nowrap;
-      animation: scrollX 20s linear infinite;
+    .marquee-track{
+      display:inline-flex; gap:28px; align-items:center; white-space:nowrap;
+      animation:scrollX 20s linear infinite;
     }
-    .marquee img { height: 30px; width: auto; filter: drop-shadow(0 0 6px rgba(0,0,0,.25)); }
-    @keyframes scrollX { to { transform: translateX(-50%);} }
-    .marquee:hover .marquee-track { animation-play-state: paused; }
+    .marquee img{ height:30px; width:auto; filter:drop-shadow(0 0 6px rgba(0,0,0,.25)) }
+    @keyframes scrollX{ to{ transform:translateX(-50%) } }
+    .marquee:hover .marquee-track{ animation-play-state:paused }
 
     /* Chispas */
-    #sparks { position: absolute; inset:0; pointer-events: none; z-index: 3; }
-    .spark {
-      position: absolute; border-radius: 999px; opacity: .95;
-      transform: translate(0,0);
-      animation: fly var(--life,900ms) ease-out forwards;
-      background: radial-gradient(circle, var(--c,#fff) 0%, rgba(255,255,255,0.0) 70%);
+    #sparks{ position:absolute; inset:0; pointer-events:none; z-index:3 }
+    .spark{
+      position:absolute; border-radius:999px; opacity:.95; transform:translate(0,0);
+      animation:fly var(--life,900ms) ease-out forwards;
+      background:radial-gradient(circle, var(--c,#fff) 0%, rgba(255,255,255,0.0) 70%);
     }
-    @keyframes fly {
-      to { transform: translate(var(--tx,40px), var(--ty,-80px)); opacity: 0; }
-    }
+    @keyframes fly{ to{ transform:translate(var(--tx,40px), var(--ty,-80px)); opacity:0 } }
 
     /* ====== Móvil: secuencia HELLO → WELCOME → LOGO en área 04 ====== */
-    @media (max-width: 980px) {
-      .welcome-left{ display:none; } /* en móvil no se muestra el gran WELCOME exterior */
-      .login-card { margin: 14% 6% 0; width: min(92vw, 520px); }
-      .brand-04 { position: relative; height: 120px; margin-bottom: 6vh; }
-      .seq-img {
-        position:absolute; inset:0; display:block; object-fit: contain; margin:auto;
-        max-width: 70%; max-height: 100%;
-        opacity: 0; filter: blur(10px);
-        transition: opacity .52s ease, filter .52s ease;
-        image-rendering: auto;
+    @media (max-width:980px){
+      .welcome-left{ display:none } /* en móvil NO va el WELCOME grande */
+      .login-card{ margin:14% 6% 0; width:min(92vw,520px) }
+      .brand-04{ position:relative; height:120px; margin-bottom:6vh }
+      .seq-img{
+        position:absolute; inset:0; display:block; object-fit:contain; margin:auto;
+        max-width:70%; max-height:100%;
+        opacity:0; filter:blur(10px);
+        transition:opacity .52s ease, filter .52s ease; image-rendering:auto;
       }
-      .seq-img.enter {
-        opacity: 1; filter: blur(0px);
-        image-rendering: pixelated; /* sensación pixelada breve al entrar */
-        transition: opacity .52s ease, filter .52s ease, image-rendering .22s steps(6);
+      .seq-img.enter{
+        opacity:1; filter:blur(0);
+        image-rendering:pixelated; /* sensación pixelada breve al entrar */
+        transition:opacity .52s ease, filter .52s ease, image-rendering .22s steps(6);
       }
-      .seq-img.leave {
-        opacity: 0; filter: blur(10px);
-      }
-      .brand-04 img#logoStatic { display:none; } /* en móvil usamos la secuencia */
+      .seq-img.leave{ opacity:0; filter:blur(10px) }
+      .brand-04 img#logoStatic{ display:none } /* en móvil usamos la secuencia */
     }
 
     /* Respeta reduced motion */
-    @media (prefers-reduced-motion: reduce) {
-      .welcome-left, .brand-04 img, .marquee-track { animation: none !important; }
-      .seq-img { transition: none !important; }
+    @media (prefers-reduced-motion:reduce){
+      .welcome-left, .brand-04 img, .marquee-track{ animation:none !important }
+      .seq-img{ transition:none !important }
     }
   </style>
 </head>
@@ -216,151 +195,114 @@
     <div id="status" role="status" aria-live="polite" style="min-height:20px;color:#9bdfff;"></div>
   </main>
 
- <!-- Marquesina (03) -->
-<div class="marquee" aria-hidden="true">
-  <div class="marquee-track" id="marqueeTrack">
-    <img src="./assets/img/tech/chatgpt.png"  alt="ChatGPT">
-    <img src="./assets/img/tech/firebase.png" alt="Firebase">
-    <img src="./assets/img/tech/github.png"   alt="GitHub">
-    <img src="./assets/img/tech/vscode.png"   alt="VS Code">
-    <img src="./assets/img/login/colombia.png" alt="Colombia">
-    <!-- duplicado para loop perfecto -->
-    <img src="./assets/img/tech/chatgpt.png"  alt="">
-    <img src="./assets/img/tech/firebase.png" alt="">
-    <img src="./assets/img/tech/github.png"   alt="">
-    <img src="./assets/img/tech/vscode.png"   alt="">
-    <img src="./assets/img/login/colombia.png" alt="">
+  <!-- Marquesina (03) -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track" id="marqueeTrack">
+      <img src="./assets/img/tech/chatgpt.png"  alt="ChatGPT">
+      <img src="./assets/img/tech/firebase.png" alt="Firebase">
+      <img src="./assets/img/tech/github.png"   alt="GitHub">
+      <img src="./assets/img/tech/vscode.png"   alt="VS Code">
+      <img src="./assets/img/login/colombia.png" alt="Colombia">
+      <!-- duplicado para loop perfecto -->
+      <img src="./assets/img/tech/chatgpt.png"  alt="">
+      <img src="./assets/img/tech/firebase.png" alt="">
+      <img src="./assets/img/tech/github.png"   alt="">
+      <img src="./assets/img/tech/vscode.png"   alt="">
+      <img src="./assets/img/login/colombia.png" alt="">
+    </div>
   </div>
-</div>
-
 
   <!-- Firebase + lógica de la página -->
   <script type="module">
     // ====== Imports Firebase ======
     import { auth } from "./firebase-config.js";
-    import {
-      signInWithEmailAndPassword,
-      sendPasswordResetEmail
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { signInWithEmailAndPassword, sendPasswordResetEmail }
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     // ====== Helpers DOM ======
     const $ = (s)=>document.querySelector(s);
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const prefersReduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     // ====== Chispas (PC y móvil) ======
     const sparksRoot = $("#sparks");
     let lastBurst = 0, activeSparks = 0;
-    function spawnSpark(x, y) {
-      if (prefersReduced) return;
-      if (activeSparks > 120) return;
+    function spawnSpark(x,y){
+      if (prefersReduced || activeSparks>120) return;
       const s = document.createElement("span");
       s.className = "spark";
       const size = 6 + Math.random()*8;
-      const hue = Math.floor(Math.random()*360);
-      s.style.width = size+"px";
-      s.style.height= size+"px";
-      s.style.left = x+"px";
-      s.style.top  = y+"px";
+      const hue  = Math.floor(Math.random()*360);
+      s.style.width = size+"px"; s.style.height = size+"px";
+      s.style.left = x+"px"; s.style.top = y+"px";
       s.style.setProperty("--tx", (Math.random()*140 - 70) + "px");
       s.style.setProperty("--ty", (Math.random()*-120 - 40) + "px");
       s.style.setProperty("--life", (800 + Math.random()*400) + "ms");
       s.style.setProperty("--c", `hsl(${hue} 90% 65%)`);
       sparksRoot.appendChild(s);
-      activeSparks++;
-      setTimeout(()=>{ s.remove(); activeSparks--; }, 1300);
+      activeSparks++; setTimeout(()=>{ s.remove(); activeSparks--; }, 1300);
     }
-    function burst(evt, count=16){
-      const now = performance.now();
-      if (now - lastBurst < 400) return; // máx 2 bursts/seg
-      lastBurst = now;
+    function burst(evt,count=16){
+      const now = performance.now(); if (now-lastBurst<400) return; lastBurst = now;
       const x = evt.clientX ?? (evt.touches?.[0]?.clientX ?? innerWidth/2);
       const y = evt.clientY ?? (evt.touches?.[0]?.clientY ?? innerHeight/2);
-      for (let i=0;i<count;i++) spawnSpark(x,y);
+      for(let i=0;i<count;i++) spawnSpark(x,y);
     }
-    document.addEventListener("click", (e)=> burst(e, 16), {passive:true});
-    document.addEventListener("touchstart", (e)=> burst(e, 16), {passive:true});
-    $("#signInBtn").addEventListener("click", (e)=> burst(e, 18), {passive:true});
+    addEventListener("click", (e)=>burst(e,16), {passive:true});
+    addEventListener("touchstart", (e)=>burst(e,16), {passive:true});
+    $("#signInBtn").addEventListener("click",(e)=>burst(e,18), {passive:true});
 
     // ====== Secuencia móvil (área 04) ======
-    const mqMobile = window.matchMedia("(max-width: 980px)");
+    const mqMobile = matchMedia("(max-width: 980px)");
     const hello   = $("#seqHello");
     const welcome = $("#seqWelcome");
     const logo    = $("#seqLogo");
     let seqTimer;
     function show(elIn, elOuts){
-      elOuts.forEach(el => { el.classList.remove("enter"); el.classList.add("leave"); });
-      // pixelado breve + blur crossfade
-      elIn.classList.remove("leave");
-      void elIn.offsetWidth; // reflow para reiniciar transición
-      elIn.classList.add("enter");
+      elOuts.forEach(el=>{ el.classList.remove("enter"); el.classList.add("leave") });
+      elIn.classList.remove("leave"); void elIn.offsetWidth; elIn.classList.add("enter");
     }
     function runSequence(){
       if (!mqMobile.matches || prefersReduced) return;
-      const stepA = ()=> { show(hello,  [welcome, logo]);  seqTimer = setTimeout(stepB, 3000); };
-      const stepB = ()=> { show(welcome,[hello,  logo]);  seqTimer = setTimeout(stepC, 4000); };
-      const stepC = ()=> { show(logo,   [hello,  welcome]);seqTimer = setTimeout(stepA,10000); };
+      const stepA = ()=>{ show(hello,[welcome,logo]);  seqTimer=setTimeout(stepB,3000) };
+      const stepB = ()=>{ show(welcome,[hello,logo]);  seqTimer=setTimeout(stepC,4000) };
+      const stepC = ()=>{ show(logo,[hello,welcome]);  seqTimer=setTimeout(stepA,10000) };
       stepA();
     }
-    function stopSequence(){ clearTimeout(seqTimer); [hello,welcome,logo].forEach(el=>el?.classList.remove("enter","leave")); }
-    function setupSeq(e){ stopSequence(); if (mqMobile.matches && !prefersReduced) runSequence(); }
-    setupSeq();
-    mqMobile.addEventListener?.("change", setupSeq);
+    function stopSequence(){ clearTimeout(seqTimer); [hello,welcome,logo].forEach(el=>el?.classList.remove("enter","leave")) }
+    function setupSeq(){ stopSequence(); if (mqMobile.matches && !prefersReduced) runSequence() }
+    setupSeq(); mqMobile.addEventListener?.("change", setupSeq);
 
     // ====== Login real ======
-    const email = $("#email");
-    const password = $("#password");
-    const btn = $("#signInBtn");
-    const status = $("#status");
-    const forgot = $("#forgotLink");
+    const email = $("#email"), password = $("#password");
+    const btn = $("#signInBtn"), status = $("#status"), forgot = $("#forgotLink");
 
-    function setBusy(v){
-      btn.disabled = v;
-      email.disabled = v;
-      password.disabled = v;
-    }
-    function msg(t){ status.textContent = t || ""; }
+    const setBusy = (v)=>{ btn.disabled=v; email.disabled=v; password.disabled=v };
+    const msg = (t)=>{ status.textContent = t || "" };
 
-    btn.addEventListener("click", async () => {
-      try {
+    btn.addEventListener("click", async ()=>{
+      try{
         setBusy(true); msg("Iniciando sesión…");
-        const em = email.value.trim();
-        const pw = password.value;
-        const { user } = await signInWithEmailAndPassword(auth, em, pw);
-        msg("¡Bienvenido!");
-        // Redirección: si tu flujo de perfil se maneja en interaccion.html, aquí solo vamos allí
-        location.href = "./interaccion.html";
-      } catch (e) {
-        console.error(e);
-        email.setAttribute("aria-invalid","true");
-        password.setAttribute("aria-invalid","true");
-        const code = e?.code || "";
+        const { user } = await signInWithEmailAndPassword(auth, email.value.trim(), password.value);
+        msg("¡Bienvenido!"); location.href = "./interaccion.html";
+      }catch(e){
+        console.error(e); email.setAttribute("aria-invalid","true"); password.setAttribute("aria-invalid","true");
         const map = {
-          "auth/invalid-credential": "Credenciales inválidas.",
-          "auth/invalid-email": "Email no válido.",
-          "auth/user-not-found": "Usuario no encontrado.",
-          "auth/wrong-password": "Contraseña incorrecta.",
-          "auth/too-many-requests": "Demasiados intentos. Intenta más tarde.",
+          "auth/invalid-credential":"Credenciales inválidas.",
+          "auth/invalid-email":"Email no válido.",
+          "auth/user-not-found":"Usuario no encontrado.",
+          "auth/wrong-password":"Contraseña incorrecta.",
+          "auth/too-many-requests":"Demasiados intentos. Intenta más tarde."
         };
-        msg(map[code] || "No se pudo iniciar sesión. Revisa tus datos o conexión.");
-      } finally {
-        setBusy(false);
-      }
+        msg(map[e?.code] || "No se pudo iniciar sesión. Revisa tus datos o conexión.");
+      }finally{ setBusy(false) }
     });
 
-    forgot.addEventListener("click", async (e) => {
+    forgot.addEventListener("click", async (e)=>{
       e.preventDefault();
-      const em = email.value.trim();
-      if (!em) { msg("Escribe tu email arriba y vuelve a tocar en ‘Forgot password’."); return; }
-      try {
-        setBusy(true); msg("Enviando enlace de recuperación…");
-        await sendPasswordResetEmail(auth, em);
-        msg("Te envié un correo para restablecer tu contraseña.");
-      } catch (e) {
-        console.error(e);
-        msg("No pude enviar el correo de recuperación. Verifica el email.");
-      } finally {
-        setBusy(false);
-      }
+      const em = email.value.trim(); if(!em){ msg("Escribe tu email arriba y vuelve a tocar en ‘Forgot password’."); return; }
+      try{ setBusy(true); msg("Enviando enlace de recuperación…"); await sendPasswordResetEmail(auth, em); msg("Te envié un correo para restablecer tu contraseña.") }
+      catch(e){ console.error(e); msg("No pude enviar el correo de recuperación. Verifica el email.") }
+      finally{ setBusy(false) }
     });
   </script>
 </body>

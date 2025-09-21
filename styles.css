@@ -143,3 +143,6 @@ body.hero-bg::before{
 .ranking .rank-1{ background:#1f2937; border:1px solid #fbbf24; color:#fde68a }
 .ranking .rank-2{ background:#111827; border:1px solid #9ca3af; color:#e5e7eb }
 .ranking .rank-3{ background:#0f172a; border:1px solid #b45309; color:#fed7aa }
+/* overrides banda 03 */
+.page-login .marquee{ bottom:6vh; }
+.page-login .marquee img{ height:30px; width:auto; }

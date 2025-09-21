@@ -213,6 +213,23 @@
 @media (max-width:980px){
   .marquee{ pointer-events: none !important; }
 }
+/* === overrides v=16 (mobile sizing) === */
+@media (max-width:980px){
+  .brand-04{
+    height: clamp(160px, 30vh, 280px) !important; /* más alto para que no se corte */
+    overflow: visible !important;
+  }
+  /* HELLO/HI/WELCOME al 200% */
+  #seqHello, #seqHi, #seqWelcome{
+    transform: scale(2) !important;
+    transform-origin: center center !important;
+  }
+  /* LOGO al 135% */
+  #seqLogo{
+    transform: scale(1.35) !important;
+    transform-origin: center center !important;
+  }
+}
 </style>
   <link rel="preload" as="image" href="./assets/img/login/bg-cartagena-desktop.jpg" fetchpriority="high">
   <link rel="preload" as="image" href="./assets/img/login/welcome-neon.png" media="(max-width:980px)">
@@ -386,6 +403,7 @@
   </script>
 </body>
 </html>
+
 
 
 

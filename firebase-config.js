@@ -1,8 +1,8 @@
-﻿import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+﻿// firebase-config.js (CDN ESM v10.12.2)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// ⚠️ Usa TUS valores reales (son los que pegaste):
 export const firebaseConfig = {
   apiKey: "AIzaSyD_i3J54vqqi6o_FFtyORYkPSgRf6ViaK8",
   authDomain: "mi-primera-pagina-398ba.firebaseapp.com",

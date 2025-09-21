@@ -1,74 +1,79 @@
 ﻿<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Iniciar sesión · Mundo Web Sierra</title>
-  <link rel="stylesheet" href="styles.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login — Mi Primera Página</title>
+
+  <!-- Fuente y estilos globales -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+
+  <!-- Buenas prácticas de PWA/básicos -->
+  <meta name="theme-color" content="#0a1624" />
+  <meta name="description" content="Inicio de sesión — Proyecto Mi Primera Página de Ebaldo." />
 </head>
-<body class="container hero-bg">
-  <header class="nav">
-    <a href="index.html">← Inicio</a>
-    <h1>Acceso</h1>
-  </header>
+<body>
+  <noscript>
+    <p style="padding:12px;background:#ffefef;color:#900;text-align:center">
+      Necesitas habilitar JavaScript para usar el login.
+    </p>
+  </noscript>
 
-  <main class="card glass auth-card">
-    <h2 class="hero-title">Bienvenidos al Mundo Web Sierra</h2>
-    <p class="hero-sub">Accede con tu <strong>usuario</strong> o <strong>email</strong> y contraseña.</p>
+  <!-- Partículas/efectos (opcional). Si no existe el CSS, no pasa nada. -->
+  <div id="sparks" aria-hidden="true"></div>
 
-    <form id="loginForm" autocomplete="off">
-      <label>Usuario o Email
-        <input id="identifier" type="text" placeholder="tu_usuario o tu@email.com" required/>
-      </label>
-      <label>contraseña
-        <input id="password" type="password" minlength="6" required/>
-      </label>
-      <button class="btn" type="submit">Iniciar sesión</button>
-      <p id="msg"></p>
-    </form>
+  <!-- Lienzo principal -->
+  <main class="hero">
+    <!-- Bloques visuales opcionales para tu animación móvil.
+         Si no usas imágenes, estos IDs pueden quedarse vacíos y no afectará. -->
+    <img id="welcomeMobileImg" class="welcome" alt="Bienvenido" style="max-width:180px; height:auto;" />
+    <div id="brandBlock" class="brand hide">mi-primera-página</div>
 
-    <p style="margin-top:10px">¿¿No tienes cuenta? <a href="registro.html">Crear una cuenta</a></p>
+    <!-- Panel de login (alineado a tu maqueta) -->
+    <section class="login-panel glass" style="max-width:380px; width:90%; padding:24px;">
+      <header style="margin-bottom:12px">
+        <h1 style="margin:0;font-size:1.4rem;font-weight:800">Iniciar sesión</h1>
+        <p class="muted" style="margin:.25rem 0 0">Autenticación con Firebase</p>
+      </header>
+
+      <!-- Formulario con IDs que usa auth.js -->
+      <form id="loginForm" autocomplete="on" style="display:grid;gap:12px">
+        <label class="sr-only" for="email">Email</label>
+        <input id="email" name="email" type="email" inputmode="email"
+               placeholder="Email" required autocomplete="username" />
+
+        <label class="sr-only" for="password">Contraseña</label>
+        <input id="password" name="password" type="password"
+               placeholder="Contraseña" required autocomplete="current-password" />
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <a id="forgot" href="#" class="muted small">¿Olvidaste tu contraseña?</a>
+          <button id="signInBtn" type="submit" class="btn">Entrar</button>
+        </div>
+
+        <p class="muted small" style="margin:4px 0 0">
+          ¿No tienes cuenta?
+          <a href="#" id="toSignUp">Crear cuenta</a>
+        </p>
+
+        <!-- Mensajes de estado accesibles -->
+        <p id="authMessage" class="msg" role="status" aria-live="polite" style="min-height:1.2em"></p>
+      </form>
+
+      <!-- Accesos rápidos -->
+      <footer style="margin-top:6px">
+        <a class="small muted" href="./index.html">← Volver al inicio</a>
+      </footer>
+    </section>
   </main>
 
-  <script type="module">
-    import { auth, db } from "./firebase-config.js";
-    import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  <!-- Scripts ES Modules (usa SIEMPRE la misma versión en todos los imports) -->
+  <script type="module" src="./firebase-config.js"></script>
+  <script type="module" src="./auth.js"></script>
 
-    const form = document.getElementById("loginForm");
-    const msg = document.getElementById("msg");
-
-    async function usernameToEmail(username){
-      const uname = username.toLowerCase().trim();
-      const mapSnap = await getDoc(doc(db, "usernames", uname));
-      if (!mapSnap.exists()) throw new Error("Usuario no encontrado.");
-      const uid = mapSnap.data().uid;
-      const userSnap = await getDoc(doc(db, "users", uid));
-      const email = userSnap.data()?.email || (uname + "+noemail@placeholder.local");
-      return email;
-    }
-
-    form.addEventListener("submit", async (e)=>{
-      e.preventDefault();
-      msg.textContent = "Procesando…";
-      const id = document.getElementById("identifier").value.trim();
-      const pass = document.getElementById("password").value.trim();
-      try {
-        const email = id.includes("@") ? id : await usernameToEmail(id);
-        await signInWithEmailAndPassword(auth, email, pass);
-        location.href = "presentacion.html";
-      } catch (err) {
-        msg.textContent = err.message || "No se pudo Iniciar sesión.";
-      }
-    });
-  </script>
+  <!-- Efectos/UI del login (opcional). Quita esta línea si aún no creas ui-login.js -->
+  <script src="./ui-login.js" defer></script>
 </body>
 </html>
-
-
-
-
-
-
-
-

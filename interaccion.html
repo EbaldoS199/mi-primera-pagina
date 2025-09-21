@@ -5,19 +5,24 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Interacción · Juegos & Mini-chat</title>
   <link rel="stylesheet" href="styles.css" />
+  <meta name="theme-color" content="#0a1624" />
 </head>
 <body class="container hero-bg">
+  <!-- Barra superior -->
   <header class="nav">
     <a href="presentacion.html">← Volver</a>
     <h1>Interacción</h1>
-    <button class="btn" id="logoutBtn" title="Cerrar sesión">Salir</button>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="whoEmail" class="muted small"></span>
+      <button class="btn" id="logoutBtn" title="Cerrar sesión">Salir</button>
+    </div>
   </header>
 
   <main class="grid2">
     <!-- Juego 1: Tap-Bird -->
     <section class="card glass">
       <h2>Juego: Tap-Bird</h2>
-      <p class="lead">Toca / clic / barra espaciadora para volar. Pasa por los huecos para sumar puntos.</p>
+      <p class="lead">Clic / toque / barra espaciadora para volar. Pasa por los huecos para sumar puntos.</p>
       <canvas id="game" width="420" height="560" tabindex="0"></canvas>
       <div class="row">
         <button class="btn" id="restartBtn">Reiniciar</button>
@@ -31,22 +36,22 @@
     <section class="card glass">
       <h2>Comunidad</h2>
 
-      <h3>🏆 Ranking Tap-Bird</h3>
+      <h3>🏆 Ranking Tap-Bird (Top 10)</h3>
       <ol id="rankingBird" class="ranking"></ol>
 
-      <h3 style="margin-top:12px;">🏆 Ranking Runner</h3>
+      <h3 style="margin-top:12px;">🏆 Ranking Runner (Top 10)</h3>
       <ol id="rankingRunner" class="ranking"></ol>
 
       <h3 style="margin-top:18px;">💬 Mini-chat</h3>
-      <div class="chatbox" id="chatBox"></div>
+      <div class="chatbox" id="chatBox" style="max-height:260px;overflow:auto;"></div>
       <form id="chatForm" class="row" autocomplete="off">
-        <input id="chatInput" type="text" placeholder="Escribe un mensaje (Enter para enviar)"/>
+        <input id="chatInput" type="text" placeholder="Escribe un mensaje (Enter para enviar)" maxlength="280"/>
         <button class="btn" type="submit">Enviar</button>
       </form>
-      <small style="color:#94a3b8;">Se muestran solo los úúltimos 30 mensajes.</small>
+      <small style="color:#94a3b8;display:block;margin-top:6px;">Se muestran los últimos 30 mensajes.</small>
     </section>
 
-    <!-- Juego 2: Runner (salta obstáculos) -->
+    <!-- Juego 2: Runner -->
     <section class="card glass" style="grid-column:1/-1">
       <h2>Juego: Runner</h2>
       <p class="lead">Barra espaciadora para saltar. Evita obstáculos para sumar puntos.</p>
@@ -62,108 +67,141 @@
 
   <footer style="margin-top:16px;">© 2025 Interacción · Juegos & Mini-chat</footer>
 
+  <!-- LÓGICA: Firebase + Juegos + Comunidad -->
   <script type="module">
+    // ===== Imports Firebase (usar SIEMPRE 10.12.2) =====
     import { auth, db } from "./firebase-config.js";
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { collection, addDoc, serverTimestamp, query, orderBy, limit, onSnapshot, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+      collection, addDoc, setDoc, getDoc, doc, serverTimestamp,
+      query, orderBy, limit, onSnapshot, where
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // ======== Auth guard y logout ========
+    // ===== Utilidades =====
+    const $  = (s) => document.querySelector(s);
+    const whoEmail = $("#whoEmail");
+    const shortName = (u) => u?.displayName || (u?.email ? u.email.split("@")[0] : "Usuario");
+    const fmtTime = (ts) => { try { return ts?.toDate ? new Date(ts.toDate()).toLocaleTimeString() : ""; } catch { return ""; } };
+
+    // ===== Guardia de sesión + logout =====
     let currentUser = null;
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (!user) { location.href = "login.html"; return; }
-      currentUser = user; 
+      currentUser = user;
+      whoEmail.textContent = `Sesión: ${user.email ?? shortName(user)}`;
     });
-    document.getElementById("logoutBtn").onclick = () => signOut(auth).then(()=>location.href = "index.html");
 
-    // ======== Juego 1: Tap-Bird ========
-    const cvs = document.getElementById("game");
+    $("#logoutBtn")?.addEventListener("click", async () => {
+      try { await signOut(auth); } finally { location.href = "index.html"; }
+    });
+
+    // =========================================================
+    //                   JUEGO 1 — TAP-BIRD
+    // =========================================================
+    const cvs = $("#game");
     const ctx = cvs.getContext("2d");
-    const scoreText = document.getElementById("scoreText");
-    const levelText = document.getElementById("levelText");
-    const gameMsg = document.getElementById("gameMsg");
-    const restartBtn = document.getElementById("restartBtn");
+    const scoreText = $("#scoreText");
+    const levelText = $("#levelText");
+    const gameMsg   = $("#gameMsg");
+    const restartBtn= $("#restartBtn");
 
     let bird, pipes, score, level, gravity, jumpForce, speed, gap, running;
+    const PIPE_W = 46;
 
-    function resetGame(){
-      bird = { x: 100, y: 200, r: 14, vy: 0 };
-      pipes = []; score = 0; level = 1;
-      gravity = 0.45; jumpForce = -7.5; speed = 2.2; gap = 130; running = true;
-      gameMsg.textContent = "";
-      spawnPipe(); spawnPipe();
-      loop(); updateHUD();
+    function updateHUD(){
+      scoreText.textContent = "Puntaje: " + score;
+      levelText.textContent = "Nivel: " + level;
     }
-    function updateHUD(){ scoreText.textContent = "Puntaje: " + score; levelText.textContent = "Nivel: " + level; }
-    function colorByLevel(lv){ if (lv>=5) return "#a78bfa"; if (lv>=4) return "#22d3ee"; if (lv>=3) return "#34d399"; if (lv>=2) return "#f59e0b"; return "#60a5fa"; }
+    function colorByLevel(lv){
+      if (lv>=5) return "#a78bfa"; if (lv>=4) return "#22d3ee";
+      if (lv>=3) return "#34d399"; if (lv>=2) return "#f59e0b";
+      return "#60a5fa";
+    }
     function spawnPipe(){
       const last = pipes[pipes.length-1];
       const minTop = 60, maxTop = cvs.height - 200;
-      const top = Math.max(minTop, Math.min(maxTop, (last? last.top : 220) + (Math.random()*120-60)));
-      pipes.push({ x: cvs.width + (last? last.x + 200 : 0), top, gap, passed:false });
+      const prev = last ? last.top : 220;
+      const top = Math.max(minTop, Math.min(maxTop, prev + (Math.random()*120-60)));
+      const spacing = 200 + Math.random()*50;
+      pipes.push({ x: (last ? last.x : cvs.width) + spacing, top, gap, passed:false });
     }
-    function jump(){ bird.vy = jumpForce; }
-    function collide(px, py, pr, rx, ry, rw, rh){
+    function collideCircleRect(px, py, pr, rx, ry, rw, rh){
       const cx = Math.max(rx, Math.min(px, rx+rw));
       const cy = Math.max(ry, Math.min(py, ry+rh));
       const dx = px - cx, dy = py - cy;
       return dx*dx + dy*dy < pr*pr;
     }
-    function loop(){
+    function jump(){ bird.vy = jumpForce; }
+
+    function loopBird(){
       if (!running) return;
-      requestAnimationFrame(loop);
+      requestAnimationFrame(loopBird);
+
       bird.vy += gravity; bird.y += bird.vy;
 
       ctx.fillStyle = "#0b1220"; ctx.fillRect(0,0,cvs.width,cvs.height);
+
       ctx.fillStyle = colorByLevel(level);
       for (let p of pipes){
         p.x -= speed;
-        ctx.fillRect(p.x, 0, 46, p.top);
+        ctx.fillRect(p.x, 0, PIPE_W, p.top);
         const bottomY = p.top + p.gap;
-        ctx.fillRect(p.x, bottomY, 46, cvs.height-bottomY);
-        if (!p.passed && p.x + 46 < bird.x - bird.r){
+        ctx.fillRect(p.x, bottomY, PIPE_W, cvs.height-bottomY);
+
+        if (!p.passed && p.x + PIPE_W < bird.x - bird.r){
           p.passed = true; score++;
           if (score % 8 === 0){ level++; speed += 0.25; if (gap > 100) gap -= 4; }
           updateHUD();
         }
       }
       if (pipes.length < 5) spawnPipe();
-      while (pipes.length && pipes[0].x < -60) pipes.shift();
+      while (pipes.length && pipes[0].x < -PIPE_W-20) pipes.shift();
 
-      ctx.beginPath(); ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI*2); ctx.fillStyle = "#eab308"; ctx.fill(); ctx.closePath();
+      ctx.beginPath(); ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI*2);
+      ctx.fillStyle = "#eab308"; ctx.fill(); ctx.closePath();
 
-      if (bird.y - bird.r < 0 || bird.y + bird.r > cvs.height) return gameOver();
+      if (bird.y - bird.r < 0 || bird.y + bird.r > cvs.height) return gameOverBird();
       for (let p of pipes){
-        if (collide(bird.x, bird.y, bird.r, p.x, 0, 46, p.top) ||
-            collide(bird.x, bird.y, bird.r, p.x, p.top+p.gap, 46, cvs.height-(p.top+p.gap))){
-          return gameOver();
+        if (collideCircleRect(bird.x, bird.y, bird.r, p.x, 0, PIPE_W, p.top) ||
+            collideCircleRect(bird.x, bird.y, bird.r, p.x, p.top+p.gap, PIPE_W, cvs.height-(p.top+p.gap))){
+          return gameOverBird();
         }
       }
     }
-    function gameOver(){
+
+    function resetBird(){
+      bird = { x: 100, y: 200, r: 14, vy: 0 };
+      pipes = [];
+      score = 0; level = 1;
+      gravity = 0.45; jumpForce = -7.5; speed = 2.2; gap = 130; running = true;
+      gameMsg.textContent = "";
+      spawnPipe(); spawnPipe();
+      updateHUD();
+      loopBird();
+    }
+    function gameOverBird(){
       running = false;
       gameMsg.textContent = "Game Over · tu puntaje: " + score + " · Guardando…";
-      saveScore(score, "tapbird").then(()=>{ gameMsg.textContent = "Puntaje guardado ✅"; })
-                                 .catch((e)=>{ gameMsg.textContent = "No se pudo guardar: " + e.message; });
+      saveBestScore(score, "tapbird")
+        .then(()=> gameMsg.textContent = "Puntaje guardado ✅")
+        .catch((e)=> gameMsg.textContent = "No se pudo guardar: " + (e?.message ?? e));
     }
-    cvs.addEventListener("pointerdown", ()=> jump());
-    restartBtn.onclick = ()=> resetGame();
 
-    // ======== Juego 2: Runner ========
-    const rcv = document.getElementById("runner");
+    cvs.addEventListener("pointerdown", () => jump(), { passive:true });
+    restartBtn?.addEventListener("click", resetBird);
+
+    // =========================================================
+    //                   JUEGO 2 — RUNNER
+    // =========================================================
+    const rcv = $("#runner");
     const rtx = rcv.getContext("2d");
-    const runMsg   = document.getElementById("runMsg");
-    const runScore = document.getElementById("runScore");
-    const runLevel = document.getElementById("runLevel");
-    const runRestart = document.getElementById("runRestart");
+    const runMsg   = $("#runMsg");
+    const runScore = $("#runScore");
+    const runLevel = $("#runLevel");
+    const runRestart = $("#runRestart");
 
     let rPlayer, rObst, rScore, rSpeed, rGravity, rJump, rGround, runningR;
 
-    function resetRunner(){
-      rGround = rcv.height - 60;
-      rPlayer = { x: 80, y: rGround-20, w: 22, h: 22, vy: 0 };
-      rObst = []; rScore = 0; rSpeed = 4; rGravity = 0.8; rJump = -12; runningR = true;
-      runMsg.textContent = ""; spawnObs(); loopRunner(); updateRunHUD();
-    }
     function updateRunHUD(){
       runScore.textContent = "Puntaje: " + rScore;
       runLevel.textContent = "Velocidad: " + (rSpeed/4).toFixed(1) + "x";
@@ -202,7 +240,7 @@
           updateRunHUD();
         }
         if (collideR({x:rPlayer.x,y:rPlayer.y,w:rPlayer.w,h:rPlayer.h}, o)){
-          return gameOverR();
+          return gameOverRunner();
         }
       }
       if (rObst.length < 4) spawnObs();
@@ -211,103 +249,134 @@
       rtx.fillStyle = "#f59e0b";
       rtx.fillRect(rPlayer.x, rPlayer.y, rPlayer.w, rPlayer.h);
     }
-    function gameOverR(){
+
+    function resetRunner(){
+      rGround = rcv.height - 60;
+      rPlayer = { x: 80, y: rGround-20, w: 22, h: 22, vy: 0 };
+      rObst = []; rScore = 0; rSpeed = 4; rGravity = 0.8; rJump = -12; runningR = true;
+      runMsg.textContent = ""; spawnObs(); updateRunHUD(); loopRunner();
+    }
+    function gameOverRunner(){
       runningR = false;
       runMsg.textContent = "Game Over · tu puntaje: " + rScore + " · Guardando…";
-      saveScore(rScore, "runner").then(()=>{ runMsg.textContent = "Puntaje guardado ✅"; })
-                                 .catch((e)=>{ runMsg.textContent = "No se pudo guardar: " + e.message; });
+      saveBestScore(rScore, "runner")
+        .then(()=> runMsg.textContent = "Puntaje guardado ✅")
+        .catch((e)=> runMsg.textContent = "No se pudo guardar: " + (e?.message ?? e));
     }
-    rcv.addEventListener("pointerdown", ()=> runJump());
-    runRestart.onclick = ()=> resetRunner();
 
-    // ======== Ranking y Chat ========
-    const rankingBirdEl   = document.getElementById("rankingBird");
-    const rankingRunnerEl = document.getElementById("rankingRunner");
-    const chatBox  = document.getElementById("chatBox");
-    const chatForm = document.getElementById("chatForm");
-    const chatInput= document.getElementById("chatInput");
+    rcv.addEventListener("pointerdown", () => runJump(), { passive:true });
+    runRestart?.addEventListener("click", resetRunner);
 
-    async function saveScore(score, game){
+    // =========================================================
+    //                 FIRESTORE — SCORES & CHAT
+    // =========================================================
+    async function saveBestScore(val, game){
+      if (!currentUser) throw new Error("No hay sesión");
+      const id  = `${currentUser.uid}_${game}`;
+      const ref = doc(db, "scores", id);
+      const snap= await getDoc(ref);
+      const prev= snap.exists() ? (snap.data().score || 0) : 0;
+      const best= Math.max(prev, val);
+      await setDoc(ref, {
+        uid: currentUser.uid,
+        name: shortName(currentUser),
+        game,
+        score: best,
+        updatedAt: serverTimestamp()
+      }, { merge:true });
+    }
+
+    function watchRanking(el, game){
+      const q = query(
+        collection(db, "scores"),
+        where("game","==",game),
+        orderBy("score","desc"),
+        limit(10)
+      );
+      return onSnapshot(q, (snap) => {
+        el.innerHTML = "";
+        let i=0;
+        snap.forEach(doc => {
+          const d = doc.data(); i++;
+          const medal = i===1?"👑🥇": i===2?"🥈": i===3?"🥉":"";
+          const li = document.createElement("li");
+          li.className = "rank-" + i;
+          li.innerHTML = `<strong>${i}. ${d.name ?? "Anónimo"}</strong> — ${d.score} ${medal}`;
+          el.appendChild(li);
+        });
+      }, (err) => {
+        console.error("Ranking error:", err);
+        el.innerHTML = `<li>Necesitas crear un índice en Firestore (mira la consola y haz clic en el enlace que te da Firestore).</li>`;
+      });
+    }
+
+    function watchChat(box){
+      const q = query(collection(db, "chat"), orderBy("createdAt","desc"), limit(30));
+      return onSnapshot(q, (snap) => {
+        const items = [];
+        snap.forEach(d => items.push(d.data()));
+        items.reverse();
+        box.innerHTML = "";
+        for (const m of items){
+          const div = document.createElement("div");
+          div.className = "msg";
+          const who = m.name ?? "Anónimo";
+          const when = fmtTime(m.createdAt);
+          div.textContent = when ? `[${when}] ${who}: ${m.text ?? ""}` : `${who}: ${m.text ?? ""}`;
+          box.appendChild(div);
+        }
+        box.scrollTop = box.scrollHeight;
+      });
+    }
+
+    async function sendChat(text){
       if (!currentUser) return;
-      const username = currentUser.displayName || "user";
-      await addDoc(collection(db, "scores"), {
-        uid: currentUser.uid, username, score, game, createdAt: serverTimestamp()
+      const safe = String(text ?? "").trim().slice(0, 280);
+      if (!safe) return;
+      await addDoc(collection(db, "chat"), {
+        uid: currentUser.uid,
+        name: shortName(currentUser),
+        text: safe,
+        createdAt: serverTimestamp()
       });
     }
 
-    // Ranking Tap-Bird (top 5)
-    onSnapshot(
-      query(collection(db, "scores"), where("game","==","tapbird"), orderBy("score","desc"), limit(5)),
-      (snap)=>{
-        rankingBirdEl.innerHTML = "";
-        let i = 0;
-        snap.forEach(doc=>{
-          const d = doc.data(); i++;
-          const li = document.createElement("li");
-          const medal = i===1?"👑🥇": i===2?"👑🥈": i===3?"👑🥉":"";
-          li.className = "rank-" + i;
-          li.innerHTML = `<strong>${i}. ${d.username}</strong> — ${d.score} ${medal}`;
-          rankingBirdEl.appendChild(li);
-        });
-      }
-    );
+    // Watchers
+    const unsubs = [];
+    unsubs.push( watchRanking($("#rankingBird"), "tapbird") );
+    unsubs.push( watchRanking($("#rankingRunner"), "runner") );
 
-    // Ranking Runner (top 5)
-    onSnapshot(
-      query(collection(db, "scores"), where("game","==","runner"), orderBy("score","desc"), limit(5)),
-      (snap)=>{
-        rankingRunnerEl.innerHTML = "";
-        let i = 0;
-        snap.forEach(doc=>{
-          const d = doc.data(); i++;
-          const li = document.createElement("li");
-          const medal = i===1?"👑🥇": i===2?"👑🥈": i===3?"👑🥉":"";
-          li.className = "rank-" + i;
-          li.innerHTML = `<strong>${i}. ${d.username}</strong> — ${d.score} ${medal}`;
-          rankingRunnerEl.appendChild(li);
-        });
-      }
-    );
+    const chatBox   = $("#chatBox");
+    const chatForm  = $("#chatForm");
+    const chatInput = $("#chatInput");
 
-    // Mini-chat
-    chatForm.addEventListener("submit", async (e)=>{
-      e.preventDefault();
-      const text = chatInput.value.trim().slice(0, 280);
-      if (!text || !currentUser) return;
-      const username = currentUser.displayName || "user";
-      await addDoc(collection(db, "messages"), { uid: currentUser.uid, username, text, createdAt: serverTimestamp() });
-      chatInput.value = "";
-    });
-
-    onSnapshot(query(collection(db, "messages"), orderBy("createdAt","desc"), limit(30)), (snap)=>{
-      chatBox.innerHTML = "";
-      snap.forEach(doc=>{
-        const m = doc.data();
-        const div = document.createElement("div");
-        div.className = "msg";
-        const when = m.createdAt?.toDate?.() ? new Date(m.createdAt.toDate()).toLocaleTimeString() : "";
-        div.textContent = `[${when}] ${m.username}: ${m.text}`;
-        chatBox.appendChild(div);
-      });
-      chatBox.scrollTop = 0;
-    });
-
-    // ======== Tecla Espacio (no bloquear el chat) ========
-    window.addEventListener("keydown", (e)=>{
-      if (e.code === "Space") {
-        const el = document.activeElement;
-        const typing = el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable);
-        if (typing) return;
+    if (chatForm) {
+      chatForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        if (typeof jump==="function") jump();
-        if (typeof runJump==="function") runJump();
-      }
+        const text = chatInput.value;
+        chatInput.value = "";
+        try { await sendChat(text); } catch (e) { console.error(e); }
+      });
+      unsubs.push( watchChat(chatBox) );
+    }
+
+    // Tecla espacio (evita si estás escribiendo)
+    window.addEventListener("keydown", (e) => {
+      if (e.code !== "Space") return;
+      const el = document.activeElement;
+      const typing = el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable);
+      if (typing) return;
+      e.preventDefault();
+      if (typeof jump === "function") jump();
+      if (typeof runJump === "function") runJump();
     });
 
-    // Iniciar juegos
-    resetGame();
-    resetRunner();
+    // Arranque de juegos
+    function boot(){ resetBird(); resetRunner(); }
+    boot();
+
+    // Limpieza (opcional)
+    window.addEventListener("beforeunload", () => unsubs.forEach(u => { try{u&&u();}catch{} }));
   </script>
 </body>
 </html>
-

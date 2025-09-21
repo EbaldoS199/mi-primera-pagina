@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#0a1624" />
   <link rel="stylesheet" href="./styles.css" />
   <style>
-    /* ====== Login page specific (pequeño refuerzo) ====== */
+    /* ====== Login page specific ====== */
     .login-hero{
       position:relative;
       min-height:100dvh;
@@ -16,35 +16,35 @@
       overflow:hidden;
       isolation:isolate;
     }
-    .login-overlay{ /* oscurecedor para contraste */
+    .login-overlay{
       position:absolute; inset:0;
       background:linear-gradient(0deg, rgba(6,18,31,.60), rgba(6,18,31,.36));
       pointer-events:none;
-      z-index:0; /* asegura que quede detrás del WELCOME y la card */
+      z-index:0;
     }
 
-    /* “WELCOME” grande fuera del panel (PC) */
+    /* “WELCOME” grande (PC) arriba a la izquierda */
     .welcome-left{
       position:absolute;
       left:6%;
-      top:clamp(12px,4vh,28px);   /* arriba casi pegado */
-      bottom:auto;                /* sin bottom */
+      top:clamp(12px,4vh,28px); /* arriba casi pegado */
+      bottom:auto;
       width:min(44vw, 900px);
       height:auto;
-      filter:drop-shadow(0 0 10px #2fd3ff) drop-shadow(0 0 30px #2fd3ff);
-      animation:glowPulse 2.8s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px #2fd3ff) drop-shadow(0 0 30px #2fd3ff);
+      animation: glowPulse 2.8s ease-in-out infinite;
       user-select:none;
-      z-index:1; /* sobre el fondo, debajo de la card */
+      z-index:1;
     }
     @keyframes glowPulse{
       0%,100%{ filter:drop-shadow(0 0 10px #2fd3ff) drop-shadow(0 0 30px #2fd3ff) }
       50%    { filter:drop-shadow(0 0 16px #5ce6ff) drop-shadow(0 0 40px #5ce6ff) }
     }
 
-    /* Panel (card) a la derecha */
+    /* Panel (glass) a la derecha */
     .login-card{
       position:relative;
-      margin:6% 7% 0 auto; /* ⬅ subimos el glass (antes 10%) */
+      margin:6% 7% 0 auto; /* subimos el glass (antes 10%) */
       width:clamp(320px, 28vw, 460px);
       background:rgba(8,22,40,.52);
       backdrop-filter:blur(14px) saturate(120%);
@@ -63,7 +63,7 @@
     .brand-04{ display:grid; place-items:center; margin-bottom:18px }
     .brand-04 img{ width:82px; height:auto; object-fit:contain; filter:drop-shadow(0 0 6px rgba(47,211,255,.6)) }
 
-    /* Por defecto (PC): ocultar la secuencia para que NO aparezcan 3 imágenes */
+    /* Por defecto (PC): NO mostrar la secuencia móvil */
     .seq-img{ display:none }
 
     .field{ display:grid; gap:6px }
@@ -216,14 +216,16 @@
   <script type="module">
     // ====== Imports Firebase ======
     import { auth } from "./firebase-config.js";
-    import { signInWithEmailAndPassword, sendPasswordResetEmail }
-      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      signInWithEmailAndPassword,
+      sendPasswordResetEmail
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    // ====== Helpers DOM ======
+    // ====== Helpers ======
     const $ = (s)=>document.querySelector(s);
     const prefersReduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // ====== Chispas (PC y móvil) ======
+    // ====== Chispas ======
     const sparksRoot = $("#sparks");
     let lastBurst = 0, activeSparks = 0;
     function spawnSpark(x,y){
@@ -272,7 +274,7 @@
     function setupSeq(){ stopSequence(); if (mqMobile.matches && !prefersReduced) runSequence() }
     setupSeq(); mqMobile.addEventListener?.("change", setupSeq);
 
-    // ====== Login real ======
+    // ====== Login ======
     const email = $("#email"), password = $("#password");
     const btn = $("#signInBtn"), status = $("#status"), forgot = $("#forgotLink");
 
@@ -282,7 +284,7 @@
     btn.addEventListener("click", async ()=>{
       try{
         setBusy(true); msg("Iniciando sesión…");
-        const { user } = await signInWithEmailAndPassword(auth, email.value.trim(), password.value);
+        await signInWithEmailAndPassword(auth, email.value.trim(), password.value);
         msg("¡Bienvenido!"); location.href = "./interaccion.html";
       }catch(e){
         console.error(e); email.setAttribute("aria-invalid","true"); password.setAttribute("aria-invalid","true");

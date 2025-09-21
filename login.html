@@ -143,7 +143,7 @@
   /* === overrides v=12 (PC + móvil) === */
 @media (min-width:981px){
   /* WELCOME más arriba (casi pegado) */
-  .welcome-left{ top: clamp(0px, 1vh, 12px) !important; }
+  
 
   /* Card (Sign in) más arriba */
   .login-card{ margin: clamp(8px, 2vh, 24px) 7% 0 auto !important; }
@@ -181,6 +181,17 @@
 
   /* WELCOME aún más arriba, casi tocando */
   .welcome-left{ top: clamp(0px,.4vh,8px) !important; }
+}
+/* === overrides v=14 (card arriba + compacta) === */
+@media (min-width:981px){
+  .login-card{
+    margin: 0 7% 0 auto !important;  /* pegada arriba */
+    max-height: 90vh !important;      /* más alta que 86vh */
+    overflow: auto !important;        /* scroll interno si hiciera falta */
+    padding: 18px !important;         /* compacta */
+    gap: 10px !important;             /* compacta */
+  }
+  .brand-04{ margin-bottom: 8px !important; } /* más cerca del input */
 }
 </style>
 </head>
@@ -351,6 +362,9 @@
   </script>
 </body>
 </html>
+
+
+
 
 
 

@@ -159,6 +159,29 @@
 @media (max-width:980px){
   .marquee{ left:0 !important; right:0 !important; width:100vw !important; }
 }
+/* === overrides v=13 (subir tarjeta al máximo y despegar banda) === */
+@media (min-width:981px){
+  /* Card (Sign in) pegada arriba + scroll si es alta */
+  .login-card{
+    margin: 0 7% 0 auto !important;   /* arriba del todo */
+    max-height: 86vh !important;      /* no sale de pantalla */
+    overflow: auto !important;        /* permite scroll interno */
+  }
+
+  /* Un poco menos de aire encima del input para ganar espacio */
+  .brand-04{ margin-bottom: 10px !important; }
+
+  /* La banda no se mezcla: más abajo y más corta */
+  .marquee{
+    bottom: 1vh !important;           /* pegada al borde inferior */
+    left: 0 !important; right: auto !important;
+    width: 58vw !important;           /* ~60% del ancho en desktop */
+    z-index: 1 !important;            /* debajo de la card (card z=2) */
+  }
+
+  /* WELCOME aún más arriba, casi tocando */
+  .welcome-left{ top: clamp(0px,.4vh,8px) !important; }
+}
 </style>
 </head>
 <body class="login-hero">
@@ -328,5 +351,6 @@
   </script>
 </body>
 </html>
+
 
 

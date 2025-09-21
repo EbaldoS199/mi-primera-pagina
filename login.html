@@ -266,7 +266,7 @@
   <div id="sparks" aria-hidden="true"></div>
 
   <!-- Bienvenida grande (PC) -->
-  <img class="welcome-left" src="./assets/img/login/welcome-neon.png" alt="" aria-hidden="true">
+  <img class="welcome-left" src="=18" alt="" aria-hidden="true" loading="eager" decoding="async" fetchpriority="high">
 
   <!-- Oscurecedor para contraste -->
   <div class="login-overlay" aria-hidden="true"></div>
@@ -278,12 +278,12 @@
     <!-- Área 04 — Logo sobre el campo NAME -->
     <div class="brand-04">
       <!-- En PC: logo estático -->
-      <img id="logoStatic" src="./assets/img/brand/sierra-logo.png" alt="Sierra Developer">
+      <img id="logoStatic" src="=18" alt="Sierra Developer" loading="eager" decoding="async">
 
       <!-- En móvil: secuencia HELLO → WELCOME → LOGO -->
-      <img class="seq-img" id="seqHello"   src="./assets/img/login/hello-neon.png"   alt="HELLO" loading="lazy" decoding="async">
-      <img class="seq-img" id="seqWelcome" src="./assets/img/login/welcome-neon.png" alt="WELCOME" loading="eager" decoding="async" fetchpriority="high">
-      <img class="seq-img" id="seqLogo"    src="./assets/img/brand/sierra-logo.png"  alt="Sierra Developer" loading="eager" decoding="async" fetchpriority="high">
+      <img class="seq-img" id="seqHello"   src="=18"   alt="HELLO" loading="lazy" decoding="async" loading="eager" decoding="async">
+      <img class="seq-img" id="seqWelcome" src="=18" alt="WELCOME" loading="eager" decoding="async" fetchpriority="high" loading="eager" decoding="async">
+      <img class="seq-img" id="seqLogo"    src="=18"  alt="Sierra Developer" loading="eager" decoding="async" fetchpriority="high" loading="eager" decoding="async">
     </div>
 
     <!-- Campo NAME/Email -->
@@ -321,13 +321,13 @@
       <img src="./assets/img/tech/firebase.png" alt="Firebase">
       <img src="./assets/img/tech/github.png"   alt="GitHub">
       <img src="./assets/img/tech/vscode.png"   alt="VS Code">
-      <img src="./assets/img/login/colombia.png" alt="Colombia">
+      <img src="=18" alt="Colombia">
       <!-- duplicado para loop perfecto -->
       <img src="./assets/img/tech/chatgpt.png"  alt="">
       <img src="./assets/img/tech/firebase.png" alt="">
       <img src="./assets/img/tech/github.png"   alt="">
       <img src="./assets/img/tech/vscode.png"   alt="">
-      <img src="./assets/img/login/colombia.png" alt="">
+      <img src="=18" alt="">
     </div>
   </div>
 
@@ -426,8 +426,48 @@
       finally{ setBusy(false) }
     });
   </script>
+<script type="module">
+  const mqMobile = matchMedia("(max-width: 980px)");
+  const prefersReduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hello = document.getElementById("seqHello");
+  const welcome = document.getElementById("seqWelcome");
+  const logo = document.getElementById("seqLogo");
+
+  // Intenta parar cualquier secuencia previa
+  try { window.stopSequence?.(); } catch (e) {}
+
+  function showOne(el){
+    [hello,welcome,logo].forEach(x => x?.classList.remove("enter","leave"));
+    el?.classList.add("enter");
+  }
+
+  async function decodeAll(nodes){
+    const imgs = nodes.filter(Boolean);
+    const tasks = imgs.map(i => (i.decode ? i.decode().catch(()=>{}) : Promise.resolve()));
+    // Espera a que decodifiquen o 1.5s como máximo (para no “colgarse”)
+    await Promise.race([Promise.all(tasks), new Promise(r => setTimeout(r, 1500))]);
+  }
+
+  (async () => {
+    if (!mqMobile.matches || prefersReduced) return;
+    await decodeAll([hello, welcome, logo]);
+
+    // Si no hay nada decodificado, muestra al menos una (logo/welcome/hello)
+    const fallback = hello || welcome || logo;
+    if (!logo || !logo.complete || !logo.naturalWidth) {
+      showOne(fallback);
+      return;
+    }
+
+    // Secuencia estable (sin parpadeos)
+    showOne(hello || fallback);
+    setTimeout(() => showOne(welcome || fallback), 2400);
+    setTimeout(() => showOne(logo || fallback),    2400 + 3400);
+  })();
+</script>
 </body>
 </html>
+
 
 
 

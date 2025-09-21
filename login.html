@@ -140,7 +140,26 @@
       .welcome-left, .brand-04 img, .marquee-track{ animation:none !important }
       .seq-img{ transition:none !important }
     }
-  </style>
+  /* === overrides v=12 (PC + móvil) === */
+@media (min-width:981px){
+  /* WELCOME más arriba (casi pegado) */
+  .welcome-left{ top: clamp(0px, 1vh, 12px) !important; }
+
+  /* Card (Sign in) más arriba */
+  .login-card{ margin: clamp(8px, 2vh, 24px) 7% 0 auto !important; }
+
+  /* Logo (área 04) más grande en PC */
+  .brand-04 img#logoStatic{ width: 120px !important; }
+
+  /* Marquesina acortada: 60vw, desde el borde izquierdo, detrás de la card */
+  .marquee{ left:0 !important; right:auto !important; width:60vw !important; z-index:1 !important; }
+}
+
+/* En móvil la banda sigue ocupando todo el ancho */
+@media (max-width:980px){
+  .marquee{ left:0 !important; right:0 !important; width:100vw !important; }
+}
+</style>
 </head>
 <body class="login-hero">
   <!-- Capa de chispas -->
@@ -309,3 +328,4 @@
   </script>
 </body>
 </html>
+

@@ -267,6 +267,8 @@
   .brand-04 img#logoStatic{ display:block !important; } /* asegura el logo en móvil */
 }
 .welcome-left img{ display:block !important; } /* asegura el WELCOME */
+/* === R4 hard fix: visibilidad === */
+.welcome-left, .brand-04 img, .marquee img { opacity:1 !important; visibility:visible !important; }
 </style>
   <link rel="preload" as="image" href="./assets/img/login/bg-cartagena-desktop.jpg" fetchpriority="high">
   <link rel="preload" as="image" href="./assets/img/login/welcome-neon.png" media="(max-width:980px)">
@@ -280,7 +282,7 @@
   <div id="sparks" aria-hidden="true"></div>
 
   <!-- Bienvenida grande (PC) -->
-  <img class="welcome-left" src="=18" alt="" aria-hidden="true" loading="eager" decoding="async" fetchpriority="high">
+  <img class="welcome-left" src="./assets/img/login/welcome-neon.png?v=R4" alt="" aria-hidden="true" loading="eager" decoding="async" fetchpriority="high">
 
   <!-- Oscurecedor para contraste -->
   <div class="login-overlay" aria-hidden="true"></div>
@@ -292,12 +294,12 @@
     <!-- Área 04 — Logo sobre el campo NAME -->
     <div class="brand-04">
       <!-- En PC: logo estático -->
-      <img id="logoStatic" src="=18" alt="Sierra Developer" loading="eager" decoding="async">
+      <img id="logoStatic" src="./assets/img/brand/sierra-logo.png?v=R4" alt="Sierra Developer" loading="eager" decoding="async">
 
       <!-- En móvil: secuencia HELLO → WELCOME → LOGO -->
-      <img class="seq-img" id="seqHello"   src="=18"   alt="HELLO" loading="lazy" decoding="async" loading="eager" decoding="async">
-      <img class="seq-img" id="seqWelcome" src="=18" alt="WELCOME" loading="eager" decoding="async" fetchpriority="high" loading="eager" decoding="async">
-      <img class="seq-img" id="seqLogo"    src="=18"  alt="Sierra Developer" loading="eager" decoding="async" fetchpriority="high" loading="eager" decoding="async">
+      <img class="seq-img" id="seqHello"   src="./assets/img/login/hello-neon.png?v=R4"   alt="HELLO" loading="lazy" decoding="async" loading="eager" decoding="async">
+      <img class="seq-img" id="seqWelcome" src="./assets/img/login/welcome-neon.png?v=R4" alt="WELCOME" loading="eager" decoding="async" fetchpriority="high" loading="eager" decoding="async">
+      <img class="seq-img" id="seqLogo"    src="./assets/img/brand/sierra-logo.png?v=R4"  alt="Sierra Developer" loading="eager" decoding="async" fetchpriority="high" loading="eager" decoding="async">
     </div>
 
     <!-- Campo NAME/Email -->
@@ -331,17 +333,17 @@
   <!-- Marquesina (03) -->
   <div class="marquee" aria-hidden="true">
     <div class="marquee-track" id="marqueeTrack">
-      <img src="./assets/img/tech/chatgpt.png"  alt="ChatGPT" loading="lazy" decoding="async">
-      <img src="./assets/img/tech/firebase.png" alt="Firebase" loading="lazy" decoding="async">
-      <img src="./assets/img/tech/github.png"   alt="GitHub" loading="lazy" decoding="async">
-      <img src="./assets/img/tech/vscode.png"   alt="VS Code" loading="lazy" decoding="async">
+      <img src="./assets/img/tech/chatgpt.png?v=R4"  alt="ChatGPT" loading="lazy" decoding="async">
+      <img src="./assets/img/tech/firebase.png?v=R4" alt="Firebase" loading="lazy" decoding="async">
+      <img src="./assets/img/tech/github.png?v=R4"   alt="GitHub" loading="lazy" decoding="async">
+      <img src="./assets/img/tech/vscode.png?v=R4"   alt="VS Code" loading="lazy" decoding="async">
       <img src="=18" alt="Colombia">
       <!-- duplicado para loop perfecto -->
-      <img src="./assets/img/tech/chatgpt.png"  alt="" loading="lazy" decoding="async">
-      <img src="./assets/img/tech/firebase.png" alt="" loading="lazy" decoding="async">
-      <img src="./assets/img/tech/github.png"   alt="" loading="lazy" decoding="async">
-      <img src="./assets/img/tech/vscode.png"   alt="" loading="lazy" decoding="async">
-      <img src="=18" alt="">
+      <img src="./assets/img/tech/chatgpt.png?v=R4"  alt="" loading="lazy" decoding="async">
+      <img src="./assets/img/tech/firebase.png?v=R4" alt="" loading="lazy" decoding="async">
+      <img src="./assets/img/tech/github.png?v=R4"   alt="" loading="lazy" decoding="async">
+      <img src="./assets/img/tech/vscode.png?v=R4"   alt="" loading="lazy" decoding="async">
+      <img src="./assets/img/login/colombia.png?v=R4" alt="">
     </div>
   </div>
 
@@ -481,6 +483,7 @@
 </script>
 </body>
 </html>
+
 
 
 
